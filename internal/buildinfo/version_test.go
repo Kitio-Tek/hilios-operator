@@ -45,3 +45,10 @@ func TestInfoIncludesDate(t *testing.T) {
 		t.Fatal("Info() should include the build date")
 	}
 }
+
+func TestVersionDefault(t *testing.T) {
+	t.Parallel()
+	if Version != "dev" {
+		t.Fatalf("expected dev default, got %q", Version)
+	}
+}
