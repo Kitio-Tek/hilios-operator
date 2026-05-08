@@ -48,7 +48,9 @@ const (
 	LabelReport = "hilios.io/report"
 
 	// AnnotationPaused, when set to "true" on a HILIOS resource, suspends
-	// reconciliation without removing the object.
+	// reconciliation without removing the object. The annotation is honoured
+	// by the predicate package so the predicate suppresses reconcile loops
+	// even while the annotation is in place.
 	AnnotationPaused = "hilios.io/paused"
 
 	// AnnotationVerificationNamespace records the temporary namespace created
