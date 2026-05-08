@@ -27,7 +27,9 @@ import (
 	"k8s.io/client-go/tools/record"
 )
 
-// Normal records a Normal-type event on the supplied object.
+// Normal records a Normal-type event on the supplied object. The recorder and
+// object may be nil; both cases are no-ops so callers do not need a manager
+// reference to use this helper from tests.
 func Normal(rec record.EventRecorder, obj runtime.Object, reason, messageFmt string, args ...interface{}) {
 	if rec == nil || obj == nil {
 		return
