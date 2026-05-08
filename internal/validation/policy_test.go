@@ -106,3 +106,18 @@ func TestPolicySpecNegativeFreshness(t *testing.T) {
 		t.Fatal("negative freshness must be rejected")
 	}
 }
+
+func TestDrillSpecRejectsEmptyType(t *testing.T) {
+	t.Parallel()
+	d := &resiliencev1alpha1.RecoveryDrill{}
+	errs := DrillSpec(d)
+	found := false
+	for _, e := range errs {
+		if strings.Contains(e.Error(), "spec.type is required") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatal("missing type error not reported")
+	}
+}
