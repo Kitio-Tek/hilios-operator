@@ -290,3 +290,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+## Kubectl Helper
+
+A tiny `kubectl` plugin lives at `hack/kubectl-hilios`. Drop it into your `PATH`
+and invoke `kubectl hilios get -A` to list every HILIOS resource at once.
