@@ -21,6 +21,8 @@ import (
 )
 
 // DrillType selects the kind of corrective verification a RecoveryDrill performs.
+// The operator records the drill type as a Prometheus label so dashboards can
+// segment success rates by drill kind.
 // +kubebuilder:validation:Enum=RestoreVerification;FailoverDrill
 type DrillType string
 
