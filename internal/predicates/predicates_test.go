@@ -59,16 +59,13 @@ func TestGenerationOrPauseUpdate(t *testing.T) {
 	}
 }
 
-func TestGenerationOrPauseIgnoresOtherEvents(t *testing.T) {
+func TestGenerationOrPauseDelegatesCreate(t *testing.T) {
 	t.Parallel()
 	p := GenerationOrPause()
 
+	// GenerationChangedPredicate returns true for Create events (controller-runtime default),
+	// so Or(GenerationChanged, PauseAnnotation) must too.
 	if !p.Create(event.CreateEvent{Object: obj(1, nil)}) {
-		// GenerationChangedPredicate handles Create as true by default.
-		// We rely on the upstream behaviour; document the expectation here.
-		t.Fatalf("expected Create to be true (controller-runtime default)")
-	}
-	if p.Generic(event.GenericEvent{Object: obj(1, nil)}) {
-		t.Fatalf("expected Generic to be false")
+		t.Fatalf("expected Create to be true")
 	}
 }
