@@ -1,0 +1,9 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: example-drill
+status:
+  phase: Succeeded
+  conditions:
+    - type: Succeeded
+      status: "True"

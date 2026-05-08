@@ -1,0 +1,10 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: example
+status:
+  conditions:
+    - type: Validated
+      status: "True"
+    - type: Ready
+      status: "True"

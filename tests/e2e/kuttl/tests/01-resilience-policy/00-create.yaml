@@ -1,0 +1,15 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: example
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 600
+      freshnessSeconds: 86400
+  slo:
+    recoveryTimeSeconds: 600
+    maxReplicaSkew: 1

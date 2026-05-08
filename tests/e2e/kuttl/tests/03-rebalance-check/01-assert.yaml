@@ -1,0 +1,8 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: example-rebalance
+status:
+  conditions:
+    - type: Balanced
+      status: "True"
