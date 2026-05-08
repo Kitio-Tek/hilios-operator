@@ -66,9 +66,24 @@ spec:
                 description: HealthChecks are probes evaluated against the restored
                   or failed-over workload.
                 items:
-                  description: HealthCheck describes a probe executed against the
-                    restored workload.
+                  description: |-
+                    HealthCheck describes a probe executed against the restored workload.
+                    The probe model is inspired by the Litmus Chaos probe schema (httpProbe,
+                    k8sProbe, cmdProbe) so users familiar with chaos engineering pipelines can
+                    reuse mental models. Unlike Litmus, HILIOS probes are read-only and never
+                    inject failures.
                   properties:
+                    command:
+                      description: |-
+                        Command is the shell command executed inside the probe runner pod
+                        (only for type Cmd). Commands run in a busybox image without elevated
+                        privileges and must complete within TimeoutSeconds.
+                      type: string
+                    expectedOutput:
+                      description: |-
+                        ExpectedOutput is a substring matched against the command's stdout
+                        (only for type Cmd). When empty, exit code 0 is sufficient.
+                      type: string
                     expectedStatusCode:
                       default: 200
                       description: ExpectedStatusCode is the HTTP status code that
@@ -126,6 +141,37 @@ spec:
                           type: object
                       type: object
                       x-kubernetes-map-type: atomic
+                    resource:
+                      description: |-
+                        Resource targets a Kubernetes object whose existence is verified
+                        (only for type Kubernetes).
+                      properties:
+                        apiVersion:
+                          description: APIVersion of the target object, for example
+                            "apps/v1".
+                          type: string
+                        kind:
+                          description: Kind of the target object, for example "StatefulSet".
+                          type: string
+                        name:
+                          description: Name of the target object.
+                          type: string
+                        namespace:
+                          description: Namespace of the target object.
+                          type: string
+                      required:
+                      - apiVersion
+                      - kind
+                      - name
+                      type: object
+                    retryCount:
+                      default: 0
+                      description: |-
+                        RetryCount is the number of times the probe is re-attempted on failure
+                        before being marked failed.
+                      format: int32
+                      minimum: 0
+                      type: integer
                     timeoutSeconds:
                       default: 30
                       description: TimeoutSeconds bounds an individual probe attempt.
@@ -138,6 +184,8 @@ spec:
                       enum:
                       - HTTP
                       - Pod
+                      - Cmd
+                      - Kubernetes
                       type: string
                     url:
                       description: URL is the HTTP URL to probe (only for type HTTP).

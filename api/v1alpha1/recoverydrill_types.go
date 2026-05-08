@@ -66,13 +66,17 @@ type BackupSource struct {
 }
 
 // HealthCheck describes a probe executed against the restored workload.
+// The probe model is inspired by the Litmus Chaos probe schema (httpProbe,
+// k8sProbe, cmdProbe) so users familiar with chaos engineering pipelines can
+// reuse mental models. Unlike Litmus, HILIOS probes are read-only and never
+// inject failures.
 type HealthCheck struct {
 	// Name is a human readable identifier for the health check.
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 
 	// Type selects the probe implementation.
-	// +kubebuilder:validation:Enum=HTTP;Pod
+	// +kubebuilder:validation:Enum=HTTP;Pod;Cmd;Kubernetes
 	// +kubebuilder:default=Pod
 	Type string `json:"type"`
 
@@ -89,10 +93,48 @@ type HealthCheck struct {
 	// +optional
 	PodSelector *metav1.LabelSelector `json:"podSelector,omitempty"`
 
+	// Command is the shell command executed inside the probe runner pod
+	// (only for type Cmd). Commands run in a busybox image without elevated
+	// privileges and must complete within TimeoutSeconds.
+	// +optional
+	Command string `json:"command,omitempty"`
+
+	// ExpectedOutput is a substring matched against the command's stdout
+	// (only for type Cmd). When empty, exit code 0 is sufficient.
+	// +optional
+	ExpectedOutput string `json:"expectedOutput,omitempty"`
+
+	// Resource targets a Kubernetes object whose existence is verified
+	// (only for type Kubernetes).
+	// +optional
+	Resource *KubernetesResourceRef `json:"resource,omitempty"`
+
 	// TimeoutSeconds bounds an individual probe attempt.
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:default=30
 	TimeoutSeconds int32 `json:"timeoutSeconds,omitempty"`
+
+	// RetryCount is the number of times the probe is re-attempted on failure
+	// before being marked failed.
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:default=0
+	RetryCount int32 `json:"retryCount,omitempty"`
+}
+
+// KubernetesResourceRef identifies a target object for the Kubernetes probe.
+type KubernetesResourceRef struct {
+	// APIVersion of the target object, for example "apps/v1".
+	// +kubebuilder:validation:Required
+	APIVersion string `json:"apiVersion"`
+	// Kind of the target object, for example "StatefulSet".
+	// +kubebuilder:validation:Required
+	Kind string `json:"kind"`
+	// Namespace of the target object.
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+	// Name of the target object.
+	// +kubebuilder:validation:Required
+	Name string `json:"name"`
 }
 
 // EvidenceRecord is an audit-friendly artefact produced by a drill.
