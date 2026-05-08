@@ -69,3 +69,10 @@ func TestParseWeeklySchedule(t *testing.T) {
 		t.Fatalf("Next should be Sunday, got %s", next.Weekday())
 	}
 }
+
+func TestExprEmpty(t *testing.T) {
+	t.Parallel()
+	if _, err := Parse(""); err == nil {
+		t.Fatal("Parse must reject empty expression")
+	}
+}
