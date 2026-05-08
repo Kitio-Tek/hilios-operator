@@ -1,0 +1,13 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: low-orders-rebalance
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: orders
+      tier: low
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
