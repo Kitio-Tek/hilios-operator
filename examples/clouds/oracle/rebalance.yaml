@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: oracle-zone-spread
+  namespace: default
+  annotations:
+    hilios.io/cloud: oracle
+spec:
+  targetSelector:
+    matchLabels:
+      cloud: oracle
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
