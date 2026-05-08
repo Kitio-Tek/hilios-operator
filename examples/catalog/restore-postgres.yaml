@@ -1,0 +1,33 @@
+# A reusable restore-verification drill template aimed at a PostgreSQL
+# StatefulSet backed up via Velero. Apply this directly or use it as a starting
+# point for a Helm template / Kustomize overlay that injects the backup name.
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: postgres-restore-template
+  namespace: default
+  annotations:
+    hilios.io/catalog: postgres
+spec:
+  type: RestoreVerification
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: REPLACE_WITH_BACKUP_NAME
+    namespace: velero
+  verificationNamespace: postgres-restore-verify
+  cleanup: true
+  timeoutSeconds: 1800
+  healthChecks:
+    - name: sts-exists
+      type: Kubernetes
+      resource:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        namespace: postgres-restore-verify
+        name: postgres
+    - name: primary-readiness
+      type: HTTP
+      url: http://postgres.postgres-restore-verify.svc:5432/healthz
+      expectedStatusCode: 200
+      timeoutSeconds: 30

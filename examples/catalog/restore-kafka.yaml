@@ -1,0 +1,35 @@
+# A reusable restore-verification drill template aimed at a Kafka cluster
+# (Strimzi or vendor-managed). The probe set verifies that brokers reappear
+# in the restored namespace and respond to a metadata request.
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: kafka-restore-template
+  namespace: default
+  annotations:
+    hilios.io/catalog: kafka
+spec:
+  type: RestoreVerification
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: REPLACE_WITH_BACKUP_NAME
+    namespace: velero
+  verificationNamespace: kafka-restore-verify
+  cleanup: true
+  timeoutSeconds: 2400
+  healthChecks:
+    - name: brokers-exist
+      type: Kubernetes
+      resource:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        namespace: kafka-restore-verify
+        name: kafka
+    - name: bootstrap-readiness
+      type: Pod
+      podSelector:
+        matchLabels:
+          strimzi.io/cluster: kafka
+          strimzi.io/component-type: kafka
+      timeoutSeconds: 60

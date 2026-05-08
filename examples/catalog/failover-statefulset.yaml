@@ -1,0 +1,27 @@
+# A failover drill template applicable to any StatefulSet. The drill exercises
+# the failover path by waiting for replicas to recover after the controller
+# scales the workload through its own reconcile cycle.
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: failover-template
+  namespace: default
+  annotations:
+    hilios.io/catalog: failover
+spec:
+  type: FailoverDrill
+  policyRef:
+    name: strict
+  cleanup: false
+  timeoutSeconds: 900
+  healthChecks:
+    - name: workload-ready
+      type: Pod
+      podSelector:
+        matchLabels:
+          hilios.io/enabled: "true"
+      timeoutSeconds: 60
+    - name: post-failover-smoke
+      type: Cmd
+      command: "kubectl exec deploy/probe-runner -- ./smoke.sh"
+      expectedOutput: "OK"
