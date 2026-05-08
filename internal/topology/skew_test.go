@@ -144,3 +144,10 @@ func TestSkewSingleDomain(t *testing.T) {
 		t.Fatalf("single-domain skew want 0, got %d", got)
 	}
 }
+
+func TestSortedDomainsHandlesEmpty(t *testing.T) {
+	t.Parallel()
+	if got := SortedDomains(Distribution{}); len(got) != 0 {
+		t.Fatalf("empty distribution must yield empty slice, got %v", got)
+	}
+}
