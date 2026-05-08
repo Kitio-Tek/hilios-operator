@@ -53,3 +53,12 @@ func Int32From64(i int64) int32 {
 func Int32EqualsInt(a int32, b int) bool {
 	return int(a) == b
 }
+
+// Int32Min returns the smaller of two int32 values. It is a tiny helper to
+// avoid importing math purely for the comparison.
+func Int32Min(a, b int32) int32 {
+	if a < b {
+		return a
+	}
+	return b
+}
