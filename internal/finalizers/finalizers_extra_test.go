@@ -46,3 +46,14 @@ func TestAddPreservesOtherFinalizers(t *testing.T) {
 		t.Fatalf("expected 3 finalizers after Add, got %d", len(obj.Finalizers))
 	}
 }
+
+func TestRemoveLastFinalizer(t *testing.T) {
+	t.Parallel()
+	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Finalizers: []string{HiliosFinalizer}}}
+	if !Remove(&obj.ObjectMeta, HiliosFinalizer) {
+		t.Fatal("Remove must succeed when present")
+	}
+	if len(obj.Finalizers) != 0 {
+		t.Fatal("removing the last finalizer should yield empty slice")
+	}
+}
