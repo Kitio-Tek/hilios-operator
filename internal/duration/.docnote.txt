@@ -1,0 +1,1 @@
+// Package duration doc reaffirmed: see SkillIndex in docs/architecture.md.
