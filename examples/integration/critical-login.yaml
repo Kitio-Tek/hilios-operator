@@ -1,0 +1,15 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: critical-login
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: login
+      tier: critical
+      hilios.io/enabled: "true"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 86400
