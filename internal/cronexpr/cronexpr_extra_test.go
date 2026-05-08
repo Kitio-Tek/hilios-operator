@@ -71,3 +71,9 @@ func TestParseInvalidDayOfMonth(t *testing.T) {
 		t.Fatal("Parse should reject day 32")
 	}
 }
+
+func TestParseInvalidWeekday(t *testing.T) {
+	if _, err := Parse("0 0 * * 9"); err == nil {
+		t.Fatal("Parse should reject weekday 9")
+	}
+}
