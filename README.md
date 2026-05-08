@@ -278,6 +278,11 @@ KUTTL tests.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
+## Contributors
+
+Thanks to everyone who has filed issues, opened pull requests, or pushed
+code to this project. Run `git shortlog -sn --no-merges` for a current list.
+
 ## License
 
 Copyright 2026.
