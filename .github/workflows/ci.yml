@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: "1.24.2"
+  GOLANGCI_LINT_VERSION: "v1.64.8"
+  CONTROLLER_GEN_VERSION: "v0.15.0"
+  ENVTEST_K8S_VERSION: "1.30.0"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Verify go fmt
+        run: |
+          if [ -n "$(gofmt -l . | grep -v '^vendor/')" ]; then
+            echo "gofmt produced changes:"
+            gofmt -d $(gofmt -l . | grep -v '^vendor/')
+            exit 1
+          fi
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          args: --timeout 5m --allow-parallel-runners
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Download modules
+        run: go mod download
+
+      - name: Run unit tests with race detector
+        run: |
+          go test -race -coverprofile=coverage-unit.out -covermode=atomic ./...
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage-unit.out
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Install controller-gen
+        run: GOBIN=$(pwd)/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@${{ env.CONTROLLER_GEN_VERSION }}
+
+      - name: Generate and verify manifests are committed
+        run: |
+          export PATH=$(pwd)/bin:$PATH
+          make generate manifests
+          if ! git diff --quiet; then
+            echo "Generated files are out of date. Run: make generate manifests"
+            git --no-pager diff
+            exit 1
+          fi
+
+      - name: Build manager binary
+        run: go build -o bin/manager ./cmd/main.go
+
+      - name: Build container image
+        run: docker build -t hilios-operator:ci .
+
+  helm:
+    name: Helm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: helm lint
+        run: helm lint charts/hilios-operator
+
+      - name: helm template smoke test
+        run: helm template hilios charts/hilios-operator --namespace hilios-system | head -50
