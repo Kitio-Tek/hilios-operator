@@ -266,6 +266,10 @@ The manager uses zap-stdlib logging via controller-runtime. Set --zap-log-level=
 ### Leader Election
 
 Leader election is enabled by default and uses the Kubernetes lease primitive in coordination.k8s.io/v1.
+
+### Image
+
+Container image is published to ghcr.io/kitio-tek/hilios-operator. Multi-arch (amd64, arm64) builds are produced on tag push.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
