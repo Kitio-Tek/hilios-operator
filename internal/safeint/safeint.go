@@ -23,7 +23,7 @@ package safeint
 
 import "math"
 
-// Int32 clamps i to the int32 range. Negative values map to 0 (counts are
+// Int32 clamps i to the int32 range and returns it. Negative values map to 0 (counts are
 // non-negative by definition), values larger than math.MaxInt32 are clamped to
 // math.MaxInt32.
 func Int32(i int) int32 {
