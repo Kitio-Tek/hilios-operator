@@ -1,0 +1,13 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: medium-wishlist-rebalance
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: wishlist
+      tier: medium
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
