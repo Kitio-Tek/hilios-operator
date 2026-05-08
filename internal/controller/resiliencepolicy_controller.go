@@ -34,6 +34,7 @@ import (
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
+	"github.com/Kitio-Tek/hilios-operator/internal/labels"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
@@ -67,7 +68,7 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, fmt.Errorf("get policy: %w", err)
 	}
 
-	if policy.Spec.Suspend {
+	if policy.Spec.Suspend || policy.Annotations[labels.AnnotationPaused] == "true" {
 		conditions.False(&policy.Status.Conditions, resiliencev1alpha1.ConditionReady,
 			resiliencev1alpha1.ReasonSuspended, "policy is suspended", policy.Generation)
 		policy.Status.ObservedGeneration = policy.Generation
