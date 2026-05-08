@@ -36,6 +36,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
+	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
 )
 
 // ContentionReportReconciler reconciles a ContentionReport object.
@@ -119,7 +120,8 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	if err := r.Status().Update(ctx, report); err != nil {
 		return ctrl.Result{}, fmt.Errorf("status update: %w", err)
 	}
-	return ctrl.Result{RequeueAfter: 2 * time.Minute}, nil
+	requeue := scheduling.NextRequeue(report.Spec.Schedule, time.Now(), 2*time.Minute)
+	return ctrl.Result{RequeueAfter: requeue}, nil
 }
 
 // evaluatePod returns a finding if the pod exhibits contention signals.

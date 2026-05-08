@@ -36,6 +36,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
+	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
 	"github.com/Kitio-Tek/hilios-operator/internal/topology"
 )
 
@@ -125,7 +126,8 @@ func (r *RebalanceCheckReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	if err := r.Status().Update(ctx, check); err != nil {
 		return ctrl.Result{}, fmt.Errorf("status update: %w", err)
 	}
-	return ctrl.Result{RequeueAfter: 2 * time.Minute}, nil
+	requeue := scheduling.NextRequeue(check.Spec.Schedule, time.Now(), 2*time.Minute)
+	return ctrl.Result{RequeueAfter: requeue}, nil
 }
 
 // SetupWithManager registers the reconciler with the supplied manager.
