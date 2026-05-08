@@ -124,3 +124,15 @@ func TestDistributeIgnoresUnscheduled(t *testing.T) {
 		t.Fatalf("zone-a want 1 (unscheduled excluded), got %d", d["zone-a"])
 	}
 }
+
+func TestDistributeUsesHostnameDefault(t *testing.T) {
+	t.Parallel()
+	nodes := []corev1.Node{
+		{ObjectMeta: metav1.ObjectMeta{Name: "n1", Labels: map[string]string{"kubernetes.io/hostname": "h1"}}},
+	}
+	pods := []corev1.Pod{podOn("p1", "n1")}
+	d := Distribute(pods, nodes, "")
+	if d["h1"] != 1 {
+		t.Fatalf("default hostname key should yield h1=1, got %v", d)
+	}
+}
