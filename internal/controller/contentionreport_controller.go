@@ -34,6 +34,7 @@ import (
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
+	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 )
 
@@ -112,6 +113,8 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 
 	logger.V(1).Info("contention evaluation complete", "matched", report.Status.MatchedTargets,
 		"findings", len(report.Status.Findings))
+
+	metrics.ContentionFindings.WithLabelValues(report.Namespace, report.Name).Set(float64(len(report.Status.Findings)))
 
 	if err := r.Status().Update(ctx, report); err != nil {
 		return ctrl.Result{}, fmt.Errorf("status update: %w", err)

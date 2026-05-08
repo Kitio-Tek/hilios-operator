@@ -34,6 +34,7 @@ import (
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
+	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/topology"
 )
@@ -118,6 +119,8 @@ func (r *RebalanceCheckReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			resiliencev1alpha1.ReasonReplicaBalanced, "no action required", check.Generation)
 		check.Status.Message = "topology balanced"
 	}
+
+	metrics.RebalanceSkew.WithLabelValues(check.Namespace, check.Name).Set(float64(skew))
 
 	if err := r.Status().Update(ctx, check); err != nil {
 		return ctrl.Result{}, fmt.Errorf("status update: %w", err)

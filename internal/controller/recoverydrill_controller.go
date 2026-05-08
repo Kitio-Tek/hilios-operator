@@ -36,6 +36,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/finalizers"
 	"github.com/Kitio-Tek/hilios-operator/internal/labels"
+	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 )
 
@@ -200,6 +201,15 @@ func (r *RecoveryDrillReconciler) complete(ctx context.Context, drill *resilienc
 
 	if err := r.Status().Update(ctx, drill); err != nil {
 		return ctrl.Result{}, fmt.Errorf("status update: %w", err)
+	}
+
+	result := "Failed"
+	if success {
+		result = "Succeeded"
+	}
+	metrics.DrillsTotal.WithLabelValues(string(drill.Spec.Type), result).Inc()
+	if drill.Status.DurationSeconds > 0 {
+		metrics.DrillDurationSeconds.WithLabelValues(string(drill.Spec.Type), result).Observe(float64(drill.Status.DurationSeconds))
 	}
 	return ctrl.Result{}, nil
 }
