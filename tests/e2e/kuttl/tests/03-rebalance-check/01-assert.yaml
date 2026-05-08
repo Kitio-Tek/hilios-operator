@@ -6,3 +6,7 @@ status:
   conditions:
     - type: Balanced
       status: "True"
+    - type: Drifted
+      status: "False"
+    - type: ActionRequired
+      status: "False"

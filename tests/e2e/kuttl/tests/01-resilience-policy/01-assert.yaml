@@ -8,3 +8,5 @@ status:
       status: "True"
     - type: Ready
       status: "True"
+    - type: Degraded
+      status: "True"
