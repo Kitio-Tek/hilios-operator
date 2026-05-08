@@ -33,7 +33,8 @@ const (
 	DrillFailoverDrill DrillType = "FailoverDrill"
 )
 
-// DrillPhase is the high-level state of a drill.
+// DrillPhase is the high-level state of a drill. It is reported on
+// .status.phase and used as the primary status column in `kubectl get rdrill`.
 // +kubebuilder:validation:Enum=Pending;Running;Succeeded;Failed
 type DrillPhase string
 
