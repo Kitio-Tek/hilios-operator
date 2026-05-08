@@ -1,0 +1,19 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: sample-30
+  namespace: default
+  labels:
+    hilios.io/sample: "30"
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      sample: "30"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 18000
+      freshnessSeconds: 108000
+  slo:
+    recoveryTimeSeconds: 1800
+    maxReplicaSkew: 2
