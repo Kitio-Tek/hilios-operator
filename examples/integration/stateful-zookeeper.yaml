@@ -1,0 +1,29 @@
+# Zookeeper StatefulSet enrolled in HILIOS.
+# Apply this StatefulSet shell to opt the workload into HILIOS via the
+# hilios.io/enabled label. The container spec is intentionally minimal; replace
+# it with your real workload definition.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+  namespace: default
+  labels:
+    hilios.io/enabled: "true"
+    app: zookeeper
+spec:
+  serviceName: zookeeper
+  replicas: 3
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+        hilios.io/enabled: "true"
+    spec:
+      containers:
+        - name: zookeeper
+          image: zookeeper:latest
+          ports:
+            - containerPort: 5432
