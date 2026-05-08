@@ -1,0 +1,15 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: medium-profile
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: profile
+      tier: medium
+      hilios.io/enabled: "true"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 86400
