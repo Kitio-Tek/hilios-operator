@@ -24,3 +24,10 @@ func TestSkewWith2by3Imbalance(t *testing.T) {
 		t.Fatalf("expected skew 3, got %d", got)
 	}
 }
+
+func TestSkewAcrossManyZones(t *testing.T) {
+	d := Distribution{"a": 1, "b": 2, "c": 3, "d": 4, "e": 5}
+	if got := Skew(d); got != 4 {
+		t.Fatalf("expected skew 4, got %d", got)
+	}
+}
