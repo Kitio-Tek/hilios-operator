@@ -1,0 +1,15 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: medium-search
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: search
+      tier: medium
+      hilios.io/enabled: "true"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 86400
