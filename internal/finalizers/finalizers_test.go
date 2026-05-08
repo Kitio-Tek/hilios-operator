@@ -23,6 +23,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func TestHasFalseWhenAbsent(t *testing.T) {
+	t.Parallel()
+	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "x"}}
+	if Has(&obj.ObjectMeta, HiliosFinalizer) {
+		t.Fatal("Has must return false on empty finalizer list")
+	}
+}
+
 func TestAddAndRemove(t *testing.T) {
 	t.Parallel()
 	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "x"}}
