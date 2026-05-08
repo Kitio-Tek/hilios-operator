@@ -270,6 +270,10 @@ Leader election is enabled by default and uses the Kubernetes lease primitive in
 ### Image
 
 Container image is published to ghcr.io/kitio-tek/hilios-operator. Multi-arch (amd64, arm64) builds are produced on tag push.
+
+### Ports
+
+The manager binds 8443 for metrics (HTTPS by default) and 8081 for health probes.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
