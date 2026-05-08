@@ -36,6 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
+	"github.com/Kitio-Tek/hilios-operator/internal/buildinfo"
 	"github.com/Kitio-Tek/hilios-operator/internal/controller"
 	// +kubebuilder:scaffold:imports
 )
@@ -76,6 +77,7 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
+	setupLog.Info(buildinfo.Info())
 
 	// if the enable-http2 flag is false (the default), http/2 should be disabled
 	// due to its vulnerabilities. More specifically, disabling http/2 will
