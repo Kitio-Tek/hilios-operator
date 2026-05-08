@@ -1,0 +1,25 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: mongodb-restore-template
+  namespace: default
+  annotations:
+    hilios.io/catalog: mongodb
+spec:
+  type: RestoreVerification
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: REPLACE_WITH_BACKUP_NAME
+    namespace: velero
+  verificationNamespace: mongodb-restore-verify
+  cleanup: true
+  timeoutSeconds: 2400
+  healthChecks:
+    - name: replica-set
+      type: Kubernetes
+      resource:
+        apiVersion: apps/v1
+        kind: StatefulSet
+        namespace: mongodb-restore-verify
+        name: mongodb
