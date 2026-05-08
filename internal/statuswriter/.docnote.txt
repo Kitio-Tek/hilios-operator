@@ -1,1 +1,0 @@
-// Package statuswriter doc reaffirmed: see SkillIndex in docs/architecture.md.
