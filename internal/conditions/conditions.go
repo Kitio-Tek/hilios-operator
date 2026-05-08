@@ -48,7 +48,8 @@ func True(conds *[]metav1.Condition, condType, reason, message string, observedG
 	return Set(conds, condType, reason, message, metav1.ConditionTrue, observedGen)
 }
 
-// False is a convenience for Set with ConditionStatus False.
+// False is a convenience for Set with ConditionStatus False. The slice is
+// returned for chained assignment.
 func False(conds *[]metav1.Condition, condType, reason, message string, observedGen int64) []metav1.Condition {
 	return Set(conds, condType, reason, message, metav1.ConditionFalse, observedGen)
 }
