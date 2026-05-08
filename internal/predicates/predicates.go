@@ -34,6 +34,10 @@ func GenerationOrPause() predicate.Predicate {
 	return predicate.Or(gen, pauseAnnotationPredicate{})
 }
 
+// pauseAnnotationPredicate triggers reconcile only when the pause annotation
+// transitions between absent and "true". It deliberately ignores create,
+// delete, and generic events because the manager already triggers a reconcile
+// on those signals through other predicates.
 type pauseAnnotationPredicate struct{}
 
 func (pauseAnnotationPredicate) Create(_ event.CreateEvent) bool { return false }
