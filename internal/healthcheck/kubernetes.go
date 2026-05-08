@@ -56,6 +56,9 @@ func RunKubernetes(ctx context.Context, c client.Client, hc resiliencev1alpha1.H
 }
 
 func parseGVK(apiVersion, kind string) (schema.GroupVersionKind, error) {
+	if apiVersion == "" {
+		return schema.GroupVersionKind{}, fmt.Errorf("apiVersion is required")
+	}
 	gv, err := schema.ParseGroupVersion(apiVersion)
 	if err != nil {
 		return schema.GroupVersionKind{}, fmt.Errorf("parse apiVersion %q: %w", apiVersion, err)
