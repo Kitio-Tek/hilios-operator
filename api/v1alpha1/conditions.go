@@ -62,7 +62,9 @@ const (
 	ConditionEscalated = "Escalated"
 )
 
-// Standard condition reasons.
+// Standard condition reasons. Reasons are CamelCase by Kubernetes convention
+// and are surfaced verbatim in events so dashboards can group transitions by
+// reason without further parsing.
 const (
 	ReasonReconciling          = "Reconciling"
 	ReasonReady                = "Ready"
