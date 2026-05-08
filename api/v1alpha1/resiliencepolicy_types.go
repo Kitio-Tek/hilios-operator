@@ -73,6 +73,7 @@ type VerificationSpec struct {
 }
 
 // SLOSpec captures the recovery service level objectives the policy enforces.
+// Values are inclusive upper bounds: skew==maxReplicaSkew is treated as compliant.
 type SLOSpec struct {
 	// RecoveryTimeSeconds is the maximum acceptable time for a recovery action
 	// to complete (recovery time objective).
