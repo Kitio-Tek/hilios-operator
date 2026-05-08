@@ -1,0 +1,10 @@
+# Values used by the KUTTL test harness when installing the chart for e2e.
+replicaCount: 1
+image:
+  pullPolicy: IfNotPresent
+leaderElection:
+  enabled: false
+serviceMonitor:
+  enabled: false
+networkPolicy:
+  enabled: false
