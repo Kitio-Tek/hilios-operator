@@ -253,6 +253,16 @@ Each reconciler:
 - Dependabot with auto-merge for minor/patch updates
 - govulncheck and gosec scans on every PR
 
+## Documentation
+
+- [Architecture](docs/architecture.md) - reconciler topology and internal packages.
+- [Conditions reference](docs/conditions.md) - every condition the operator emits.
+- [Metrics reference](docs/metrics.md) - Prometheus collectors and how to scrape them.
+- [Probes](docs/probes.md) - HTTP, Pod, Cmd, and Kubernetes probe semantics.
+- [Comparison](docs/comparison.md) - relationship to Litmus, Velero, vendor operators.
+- [Roadmap](docs/roadmap.md) - planned releases.
+- [Drill catalog](examples/catalog/README.md) - reusable RecoveryDrill templates.
+
 ## Development
 
 See [DEVELOPER.md](DEVELOPER.md) for local development setup, including how to
