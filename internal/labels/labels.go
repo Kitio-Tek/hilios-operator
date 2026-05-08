@@ -28,6 +28,8 @@ const (
 	LabelEnabled = "hilios.io/enabled"
 
 	// LabelManagedBy identifies the controller responsible for an object.
+	// It uses the standard Kubernetes recommended label key so external tools
+	// (Lens, k9s, ArgoCD) can group HILIOS-managed objects automatically.
 	LabelManagedBy = "app.kubernetes.io/managed-by"
 
 	// LabelManagedByValue is the canonical value of LabelManagedBy.
