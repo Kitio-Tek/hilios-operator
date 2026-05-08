@@ -5,6 +5,7 @@
 
 [![Coverage Status](https://img.shields.io/badge/coverage-80%25-brightgreen)](.github/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/0/badge)](https://www.bestpractices.dev/)
 [![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=Kitio-Tek_hilios-operator&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Kitio-Tek_hilios-operator)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Kitio-Tek_hilios-operator&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Kitio-Tek_hilios-operator)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Kitio-Tek_hilios-operator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Kitio-Tek_hilios-operator)
