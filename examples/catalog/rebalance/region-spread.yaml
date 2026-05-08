@@ -1,0 +1,12 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: region-spread
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      tier: critical
+  topologyKey: topology.kubernetes.io/region
+  maxSkew: 0
+  dryRun: true
