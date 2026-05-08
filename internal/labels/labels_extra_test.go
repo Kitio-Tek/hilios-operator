@@ -43,3 +43,9 @@ func TestLabelPolicyDrillCheckReportConstants(t *testing.T) {
 		}
 	}
 }
+
+func TestAnnotationPausedConstant(t *testing.T) {
+	if AnnotationPaused != "hilios.io/paused" {
+		t.Fatalf("AnnotationPaused changed: %s", AnnotationPaused)
+	}
+}
