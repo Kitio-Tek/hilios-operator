@@ -1,0 +1,29 @@
+# Kafka StatefulSet enrolled in HILIOS.
+# Apply this StatefulSet shell to opt the workload into HILIOS via the
+# hilios.io/enabled label. The container spec is intentionally minimal; replace
+# it with your real workload definition.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+  namespace: default
+  labels:
+    hilios.io/enabled: "true"
+    app: kafka
+spec:
+  serviceName: kafka
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+        hilios.io/enabled: "true"
+    spec:
+      containers:
+        - name: kafka
+          image: kafka:latest
+          ports:
+            - containerPort: 5432
