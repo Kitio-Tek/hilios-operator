@@ -42,7 +42,8 @@ func Set(conds *[]metav1.Condition, condType, reason, message string, status met
 	return *conds
 }
 
-// True is a convenience for Set with ConditionStatus True.
+// True is a convenience for Set with ConditionStatus True. The slice is
+// returned for chained assignment.
 func True(conds *[]metav1.Condition, condType, reason, message string, observedGen int64) []metav1.Condition {
 	return Set(conds, condType, reason, message, metav1.ConditionTrue, observedGen)
 }
