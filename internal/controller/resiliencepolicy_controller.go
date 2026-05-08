@@ -36,6 +36,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/labels"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
+	"github.com/Kitio-Tek/hilios-operator/internal/policy"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
 )
@@ -94,6 +95,18 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 	policy.Status.MatchedTargets = matched
 
+	staleCount, err := r.countStaleVerifications(ctx, policy, time.Now())
+	if err != nil {
+		logger.Error(err, "compute stale verifications")
+		return ctrl.Result{}, err
+	}
+	policy.Status.LastDriftCount = staleCount
+	if staleCount > 0 {
+		policy.Status.LastViolation = fmt.Sprintf("%d verification(s) past freshness window", staleCount)
+	} else {
+		policy.Status.LastViolation = ""
+	}
+
 	now := metav1.NewTime(time.Now())
 	policy.Status.LastEvaluationTime = &now
 	policy.Status.ObservedGeneration = policy.Generation
@@ -150,6 +163,43 @@ func (r *ResiliencePolicyReconciler) countMatchedTargets(ctx context.Context, p 
 		return 0, err
 	}
 	return int32(len(list.Items)), nil
+}
+
+// countStaleVerifications joins the policy's verifications with the timestamps
+// of the most recent successful RecoveryDrill of the same kind in the same
+// namespace, and counts how many have aged past the freshness window.
+func (r *ResiliencePolicyReconciler) countStaleVerifications(ctx context.Context, p *resiliencev1alpha1.ResiliencePolicy, now time.Time) (int32, error) {
+	drills := &resiliencev1alpha1.RecoveryDrillList{}
+	if err := r.List(ctx, drills, client.InNamespace(p.Namespace)); err != nil {
+		return 0, err
+	}
+	lastByType := make(map[resiliencev1alpha1.VerificationKind]time.Time)
+	for _, d := range drills.Items {
+		if d.Status.Phase != resiliencev1alpha1.DrillPhaseSucceeded || d.Status.CompletionTime == nil {
+			continue
+		}
+		var kind resiliencev1alpha1.VerificationKind
+		switch d.Spec.Type {
+		case resiliencev1alpha1.DrillRestoreVerification:
+			kind = resiliencev1alpha1.VerificationRestoreVerification
+		case resiliencev1alpha1.DrillFailoverDrill:
+			kind = resiliencev1alpha1.VerificationFailoverDrill
+		default:
+			continue
+		}
+		t := d.Status.CompletionTime.Time
+		if cur, ok := lastByType[kind]; !ok || t.After(cur) {
+			lastByType[kind] = t
+		}
+	}
+	statuses := make([]policy.VerificationStatus, 0, len(p.Spec.Verifications))
+	for _, v := range p.Spec.Verifications {
+		statuses = append(statuses, policy.VerificationStatus{
+			Spec:        v,
+			LastSuccess: lastByType[v.Kind],
+		})
+	}
+	return policy.CountStale(statuses, now), nil
 }
 
 func (r *ResiliencePolicyReconciler) updateStatus(ctx context.Context, p *resiliencev1alpha1.ResiliencePolicy) error {
