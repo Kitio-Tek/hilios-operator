@@ -75,3 +75,15 @@ func TestCountStale(t *testing.T) {
 		t.Fatalf("CountStale want 1, got %d", got)
 	}
 }
+
+func TestIsStaleExactlyAtBoundary(t *testing.T) {
+	t.Parallel()
+	now := time.Date(2026, 5, 8, 12, 0, 0, 0, time.UTC)
+	v := VerificationStatus{
+		Spec:        resiliencev1alpha1.VerificationSpec{FreshnessSeconds: 60},
+		LastSuccess: now.Add(-60 * time.Second),
+	}
+	if IsStale(v, now) {
+		t.Fatal("exact boundary must not be stale; comparison is strict greater-than")
+	}
+}
