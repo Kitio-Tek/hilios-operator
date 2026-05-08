@@ -81,3 +81,14 @@ func TestRunKubernetesValidation(t *testing.T) {
 		})
 	}
 }
+
+func TestRunKubernetesEmptyAPIVersion(t *testing.T) {
+	t.Parallel()
+	hc := resiliencev1alpha1.HealthCheck{
+		Name: "x", Type: "Kubernetes",
+		Resource: &resiliencev1alpha1.KubernetesResourceRef{Kind: "Pod", Name: "p"},
+	}
+	if err := RunKubernetes(context.Background(), nil, hc); err == nil {
+		t.Fatal("empty apiVersion must return an error")
+	}
+}
