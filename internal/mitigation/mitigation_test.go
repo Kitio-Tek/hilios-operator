@@ -66,3 +66,11 @@ func TestIsAuthorised(t *testing.T) {
 		t.Fatal("unauthorised mitigation should return false")
 	}
 }
+
+func TestRecommendIncludesPatchForTopologySpread(t *testing.T) {
+	t.Parallel()
+	r := Recommend(resiliencev1alpha1.MitigationApplyTopologySpread, "demo")
+	if r.Patch == "" {
+		t.Fatal("ApplyTopologySpread must produce a patch fragment")
+	}
+}
