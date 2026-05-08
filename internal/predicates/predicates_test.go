@@ -69,3 +69,12 @@ func TestGenerationOrPauseDelegatesCreate(t *testing.T) {
 		t.Fatalf("expected Create to be true")
 	}
 }
+
+func TestGenerationOrPauseIgnoresUnchangedPause(t *testing.T) {
+	t.Parallel()
+	p := GenerationOrPause()
+	cm := obj(1, map[string]string{"hilios.io/paused": "true"})
+	if p.Update(event.UpdateEvent{ObjectOld: cm, ObjectNew: cm}) {
+		t.Fatal("identical objects must not trigger update")
+	}
+}
