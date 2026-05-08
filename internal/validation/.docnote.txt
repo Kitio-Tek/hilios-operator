@@ -1,1 +1,0 @@
-// Package validation doc reaffirmed: see SkillIndex in docs/architecture.md.

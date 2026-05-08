@@ -1,1 +1,0 @@
-// Package selector doc reaffirmed: see SkillIndex in docs/architecture.md.
