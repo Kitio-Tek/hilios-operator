@@ -1,0 +1,9 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: qa-drill
+  namespace: qa
+spec:
+  type: RestoreVerification
+  cleanup: true
+  timeoutSeconds: 1800
