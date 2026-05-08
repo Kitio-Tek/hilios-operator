@@ -72,6 +72,10 @@ serviceMonitor:
   scrapeTimeout: 10s
   labels: {}
 
+# podDisruptionBudget controls whether a 1-min-available PDB is installed.
+podDisruptionBudget:
+  enabled: false
+
 # networkPolicy controls whether a NetworkPolicy is installed for the operator pod.
 networkPolicy:
   enabled: false
