@@ -1,0 +1,12 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: staging-rebalance
+  namespace: staging
+spec:
+  targetSelector:
+    matchLabels:
+      env: staging
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
