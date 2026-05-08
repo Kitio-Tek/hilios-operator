@@ -78,3 +78,11 @@ func TestGenerationOrPauseIgnoresUnchangedPause(t *testing.T) {
 		t.Fatal("identical objects must not trigger update")
 	}
 }
+
+func TestGenerationOrPauseDeleteIsTrue(t *testing.T) {
+	t.Parallel()
+	p := GenerationOrPause()
+	if !p.Delete(event.DeleteEvent{Object: obj(1, nil)}) {
+		t.Fatal("delete events must trigger reconcile so finalizers run")
+	}
+}
