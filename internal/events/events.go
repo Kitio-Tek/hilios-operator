@@ -37,7 +37,9 @@ func Normal(rec record.EventRecorder, obj runtime.Object, reason, messageFmt str
 	rec.Eventf(obj, corev1.EventTypeNormal, reason, messageFmt, args...)
 }
 
-// Warning records a Warning-type event on the supplied object.
+// Warning records a Warning-type event on the supplied object. The recorder
+// and object may be nil; both cases are no-ops so callers do not need a
+// manager reference to use this helper from tests.
 func Warning(rec record.EventRecorder, obj runtime.Object, reason, messageFmt string, args ...interface{}) {
 	if rec == nil || obj == nil {
 		return
