@@ -27,13 +27,13 @@ import (
 
 // HealthSummary captures the key health attributes of a StatefulSet.
 type HealthSummary struct {
-	Name             string
-	Namespace        string
-	DesiredReplicas  int32
-	ReadyReplicas    int32
-	UpdatedReplicas  int32
+	Name              string
+	Namespace         string
+	DesiredReplicas   int32
+	ReadyReplicas     int32
+	UpdatedReplicas   int32
 	AvailableReplicas int32
-	Healthy          bool
+	Healthy           bool
 }
 
 // SummariseStatefulSet returns a HealthSummary built from the StatefulSet's
