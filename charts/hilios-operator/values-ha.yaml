@@ -1,0 +1,17 @@
+# High-availability values: 3 replicas, leader election, anti-affinity, ServiceMonitor.
+replicaCount: 3
+leaderElection:
+  enabled: true
+serviceMonitor:
+  enabled: true
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: hilios-operator
+        topologyKey: topology.kubernetes.io/zone
