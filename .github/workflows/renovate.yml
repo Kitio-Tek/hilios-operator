@@ -1,0 +1,20 @@
+name: Renovate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    if: github.repository == 'Kitio-Tek/hilios-operator'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run renovate
+        uses: renovatebot/github-action@v40.3.0
+        env:
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+          LOG_LEVEL: info
+        with:
+          configurationFile: renovate.json
