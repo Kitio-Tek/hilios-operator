@@ -65,3 +65,9 @@ func TestParseInvalidHour(t *testing.T) {
 		t.Fatal("Parse should reject hour 25")
 	}
 }
+
+func TestParseInvalidDayOfMonth(t *testing.T) {
+	if _, err := Parse("0 0 32 * *"); err == nil {
+		t.Fatal("Parse should reject day 32")
+	}
+}
