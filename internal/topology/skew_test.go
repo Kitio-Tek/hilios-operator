@@ -136,3 +136,11 @@ func TestDistributeUsesHostnameDefault(t *testing.T) {
 		t.Fatalf("default hostname key should yield h1=1, got %v", d)
 	}
 }
+
+func TestSkewSingleDomain(t *testing.T) {
+	t.Parallel()
+	d := Distribution{"only-zone": 5}
+	if got := Skew(d); got != 0 {
+		t.Fatalf("single-domain skew want 0, got %d", got)
+	}
+}
