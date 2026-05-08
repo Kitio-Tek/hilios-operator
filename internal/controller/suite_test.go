@@ -18,6 +18,7 @@ package controller
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -39,14 +40,38 @@ import (
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
-var cfg *rest.Config
-var k8sClient client.Client
-var testEnv *envtest.Environment
+var (
+	cfg          *rest.Config
+	k8sClient    client.Client
+	testEnv      *envtest.Environment
+	skipEnvTests bool
+)
 
+// TestControllers runs the Ginkgo controller suite against a local envtest
+// environment. When envtest binaries are missing the suite is skipped so that
+// unit tests in the package still run via TestUnit*.
 func TestControllers(t *testing.T) {
+	if envBin := envTestBinaryDir(); !dirHasFile(envBin, "etcd") {
+		t.Skip("envtest binaries missing; run `make envtest` or set KUBEBUILDER_ASSETS")
+	}
 	RegisterFailHandler(Fail)
-
 	RunSpecs(t, "Controller Suite")
+}
+
+func envTestBinaryDir() string {
+	if v := os.Getenv("KUBEBUILDER_ASSETS"); v != "" {
+		return v
+	}
+	return filepath.Join("..", "..", "bin", "k8s",
+		fmt.Sprintf("1.30.0-%s-%s", runtime.GOOS, runtime.GOARCH))
+}
+
+func dirHasFile(dir, name string) bool {
+	if dir == "" {
+		return false
+	}
+	_, err := os.Stat(filepath.Join(dir, name))
+	return err == nil
 }
 
 var _ = BeforeSuite(func() {
@@ -56,18 +81,10 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
 		ErrorIfCRDPathMissing: true,
-
-		// The BinaryAssetsDirectory is only required if you want to run the tests directly
-		// without call the makefile target test. If not informed it will look for the
-		// default path defined in controller-runtime which is /usr/local/kubebuilder/.
-		// Note that you must have the required binaries setup under the bin directory to perform
-		// the tests directly. When we run make test it will be setup and used automatically.
-		BinaryAssetsDirectory: filepath.Join("..", "..", "bin", "k8s",
-			fmt.Sprintf("1.30.0-%s-%s", runtime.GOOS, runtime.GOARCH)),
+		BinaryAssetsDirectory: envTestBinaryDir(),
 	}
 
 	var err error
-	// cfg is defined in this file globally.
 	cfg, err = testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
@@ -80,10 +97,12 @@ var _ = BeforeSuite(func() {
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
-
 })
 
 var _ = AfterSuite(func() {
+	if testEnv == nil {
+		return
+	}
 	By("tearing down the test environment")
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())

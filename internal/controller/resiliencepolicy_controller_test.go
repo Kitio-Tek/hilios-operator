@@ -18,67 +18,163 @@ package controller
 
 import (
 	"context"
+	"testing"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-
+	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/record"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
+	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 )
 
-var _ = Describe("ResiliencePolicy Controller", func() {
-	Context("When reconciling a resource", func() {
-		const resourceName = "test-resource"
+func unitScheme(t *testing.T) *runtime.Scheme {
+	t.Helper()
+	s := runtime.NewScheme()
+	if err := clientgoscheme.AddToScheme(s); err != nil {
+		t.Fatalf("client-go scheme: %v", err)
+	}
+	if err := resiliencev1alpha1.AddToScheme(s); err != nil {
+		t.Fatalf("v1alpha1 scheme: %v", err)
+	}
+	return s
+}
 
-		ctx := context.Background()
+func newPolicy(name string, mut func(*resiliencev1alpha1.ResiliencePolicy)) *resiliencev1alpha1.ResiliencePolicy {
+	p := &resiliencev1alpha1.ResiliencePolicy{
+		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "default", Generation: 1},
+		Spec: resiliencev1alpha1.ResiliencePolicySpec{
+			TargetSelector: metav1.LabelSelector{MatchLabels: map[string]string{"hilios.io/enabled": "true"}},
+			Verifications: []resiliencev1alpha1.VerificationSpec{
+				{Kind: resiliencev1alpha1.VerificationRestoreVerification, IntervalSeconds: 600, FreshnessSeconds: 86400},
+			},
+		},
+	}
+	if mut != nil {
+		mut(p)
+	}
+	return p
+}
 
-		typeNamespacedName := types.NamespacedName{
-			Name:      resourceName,
-			Namespace: "default", // TODO(user):Modify as needed
-		}
-		resiliencepolicy := &resiliencev1alpha1.ResiliencePolicy{}
+func TestUnitResiliencePolicyReady(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
 
-		BeforeEach(func() {
-			By("creating the custom resource for the Kind ResiliencePolicy")
-			err := k8sClient.Get(ctx, typeNamespacedName, resiliencepolicy)
-			if err != nil && errors.IsNotFound(err) {
-				resource := &resiliencev1alpha1.ResiliencePolicy{
-					ObjectMeta: metav1.ObjectMeta{
-						Name:      resourceName,
-						Namespace: "default",
-					},
-					// TODO(user): Specify other spec details if needed.
-				}
-				Expect(k8sClient.Create(ctx, resource)).To(Succeed())
-			}
-		})
+	policy := newPolicy("p1", nil)
+	sts := &appsv1.StatefulSet{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "db",
+			Namespace: "default",
+			Labels:    map[string]string{"hilios.io/enabled": "true"},
+		},
+	}
 
-		AfterEach(func() {
-			// TODO(user): Cleanup logic after each test, like removing the resource instance.
-			resource := &resiliencev1alpha1.ResiliencePolicy{}
-			err := k8sClient.Get(ctx, typeNamespacedName, resource)
-			Expect(err).NotTo(HaveOccurred())
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy, sts).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
 
-			By("Cleanup the specific resource instance ResiliencePolicy")
-			Expect(k8sClient.Delete(ctx, resource)).To(Succeed())
-		})
-		It("should successfully reconcile the resource", func() {
-			By("Reconciling the created resource")
-			controllerReconciler := &ResiliencePolicyReconciler{
-				Client: k8sClient,
-				Scheme: k8sClient.Scheme(),
-			}
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
 
-			_, err := controllerReconciler.Reconcile(ctx, reconcile.Request{
-				NamespacedName: typeNamespacedName,
-			})
-			Expect(err).NotTo(HaveOccurred())
-			// TODO(user): Add more specific assertions depending on your controller's reconciliation logic.
-			// Example: If you expect a certain status condition after reconciliation, verify it here.
-		})
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	if err := cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got); err != nil {
+		t.Fatalf("get: %v", err)
+	}
+	if !conditions.IsTrue(got.Status.Conditions, resiliencev1alpha1.ConditionReady) {
+		t.Fatalf("Ready condition want True, got %#v", got.Status.Conditions)
+	}
+	if !conditions.IsTrue(got.Status.Conditions, resiliencev1alpha1.ConditionValidated) {
+		t.Fatalf("Validated condition want True, got %#v", got.Status.Conditions)
+	}
+	if got.Status.MatchedTargets != 1 {
+		t.Fatalf("matched targets want 1, got %d", got.Status.MatchedTargets)
+	}
+}
+
+func TestUnitResiliencePolicySuspended(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	policy := newPolicy("p1", func(p *resiliencev1alpha1.ResiliencePolicy) {
+		p.Spec.Suspend = true
 	})
-})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
+
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	if err := cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got); err != nil {
+		t.Fatalf("get: %v", err)
+	}
+	if !conditions.IsFalse(got.Status.Conditions, resiliencev1alpha1.ConditionReady) {
+		t.Fatalf("Ready condition want False (suspended), got %#v", got.Status.Conditions)
+	}
+}
+
+func TestUnitResiliencePolicyValidationFails(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	policy := newPolicy("p1", func(p *resiliencev1alpha1.ResiliencePolicy) {
+		p.Spec.Verifications = nil
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
+
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	if err := cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got); err != nil {
+		t.Fatalf("get: %v", err)
+	}
+	if !conditions.IsFalse(got.Status.Conditions, resiliencev1alpha1.ConditionValidated) {
+		t.Fatalf("Validated must be False on validation error, got %#v", got.Status.Conditions)
+	}
+}
+
+func TestUnitResiliencePolicyEmptySelectorDegrades(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	policy := newPolicy("p1", func(p *resiliencev1alpha1.ResiliencePolicy) {
+		p.Spec.TargetSelector = metav1.LabelSelector{MatchLabels: map[string]string{"hilios.io/enabled": "true"}}
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
+
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	_ = cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got)
+	if got.Status.MatchedTargets != 0 {
+		t.Fatalf("expected 0 matches, got %d", got.Status.MatchedTargets)
+	}
+	if !conditions.IsTrue(got.Status.Conditions, resiliencev1alpha1.ConditionDegraded) {
+		t.Fatalf("Degraded want True for zero matches, got %#v", got.Status.Conditions)
+	}
+}
