@@ -25,7 +25,9 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-// Distribution is a domain -> replica count mapping.
+// Distribution is a domain -> replica count mapping. Domains with zero
+// replicas are kept in the map so that the absence of pods in a zone counts
+// toward the skew computation.
 type Distribution map[string]int32
 
 // Distribute computes how many of the supplied pods land in each value of the
