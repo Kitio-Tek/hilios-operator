@@ -1,9 +1,11 @@
 # HILIOS Operator
 
 [![CI](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/ci.yml)
+[![Security](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/security.yml)
+[![CodeQL](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/codeql.yml)
+[![Trivy](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/trivy.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/trivy.yml)
+[![Helm](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/helm.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/helm.yml)
 [![Latest release](https://img.shields.io/github/v/release/Kitio-Tek/hilios-operator?sort=semver)](https://github.com/Kitio-Tek/hilios-operator/releases)
-
-[![Coverage Status](https://img.shields.io/badge/coverage-80%25-brightgreen)](.github/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
