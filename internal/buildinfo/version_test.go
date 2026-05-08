@@ -38,3 +38,10 @@ func TestInfoIncludesCommit(t *testing.T) {
 		t.Fatal("Info() should include the commit field")
 	}
 }
+
+func TestInfoIncludesDate(t *testing.T) {
+	t.Parallel()
+	if !strings.Contains(Info(), "built") {
+		t.Fatal("Info() should include the build date")
+	}
+}
