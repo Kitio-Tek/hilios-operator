@@ -1,11 +1,110 @@
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  labels:
-    app.kubernetes.io/name: hilios-operator
-    app.kubernetes.io/managed-by: kustomize
   name: manager-role
 rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - contentionreports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - contentionreports/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - contentionreports/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - rebalancechecks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - rebalancechecks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - rebalancechecks/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - recoverydrills
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - recoverydrills/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - recoverydrills/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - resiliencepolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - resiliencepolicies/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - resiliencepolicies/status
+  verbs:
+  - get
+  - patch
+  - update

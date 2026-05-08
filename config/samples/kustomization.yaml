@@ -1,0 +1,7 @@
+## Append samples of your project ##
+resources:
+- resilience_v1alpha1_resiliencepolicy.yaml
+- resilience_v1alpha1_recoverydrill.yaml
+- resilience_v1alpha1_rebalancecheck.yaml
+- resilience_v1alpha1_contentionreport.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

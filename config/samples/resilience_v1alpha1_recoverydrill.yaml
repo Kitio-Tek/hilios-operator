@@ -1,0 +1,9 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  labels:
+    app.kubernetes.io/name: hilios-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: recoverydrill-sample
+spec:
+  # TODO(user): Add fields here

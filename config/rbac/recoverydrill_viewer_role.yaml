@@ -1,0 +1,23 @@
+# permissions for end users to view recoverydrills.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: hilios-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: recoverydrill-viewer-role
+rules:
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - recoverydrills
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - resilience.hilios.io
+  resources:
+  - recoverydrills/status
+  verbs:
+  - get
