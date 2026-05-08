@@ -62,8 +62,10 @@ spec:
                   Mitigations are the corrective actions this policy authorises.
                   An empty list disables all mitigations (observe-only mode).
                 items:
-                  description: MitigationKind enumerates corrective actions a ResiliencePolicy
-                    may authorize.
+                  description: |-
+                    MitigationKind enumerates corrective actions a ResiliencePolicy may authorize.
+                    Mitigations are intentionally narrow: HILIOS prefers to recommend safe
+                    actions rather than execute destructive ones automatically.
                   enum:
                   - Isolate
                   - ApplyTopologySpread
@@ -153,8 +155,10 @@ spec:
               verifications:
                 description: Verifications are the checks this policy authorises.
                 items:
-                  description: VerificationSpec describes a single verification check
-                    the policy authorizes.
+                  description: |-
+                    VerificationSpec describes a single verification check the policy authorises.
+                    Multiple verifications of the same kind are allowed; the freshest successful
+                    drill of any matching kind satisfies the freshness window.
                   properties:
                     freshnessSeconds:
                       default: 86400
