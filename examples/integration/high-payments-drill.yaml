@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: high-payments-drill
+  namespace: default
+spec:
+  type: RestoreVerification
+  cleanup: true
+  timeoutSeconds: 1800
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: payments-backup
+    namespace: velero
