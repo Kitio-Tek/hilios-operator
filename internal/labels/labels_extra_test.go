@@ -29,3 +29,17 @@ func TestLabelManagedByValue(t *testing.T) {
 		t.Fatalf("LabelManagedByValue changed: %s", LabelManagedByValue)
 	}
 }
+
+func TestLabelPolicyDrillCheckReportConstants(t *testing.T) {
+	cases := map[string]string{
+		"policy": LabelPolicy,
+		"drill":  LabelDrill,
+		"check":  LabelCheck,
+		"report": LabelReport,
+	}
+	for kind, label := range cases {
+		if label == "" {
+			t.Fatalf("%s label must not be empty", kind)
+		}
+	}
+}
