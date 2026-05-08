@@ -35,6 +35,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/finalizers"
+	"github.com/Kitio-Tek/hilios-operator/internal/healthcheck"
 	"github.com/Kitio-Tek/hilios-operator/internal/labels"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
@@ -138,6 +139,26 @@ func (r *RecoveryDrillReconciler) executeDrill(ctx context.Context, drill *resil
 	if drill.Spec.Type == resiliencev1alpha1.DrillRestoreVerification {
 		if err := r.ensureVerificationNamespace(ctx, drill); err != nil {
 			return r.complete(ctx, drill, false, resiliencev1alpha1.ReasonRestoreFailed, err.Error())
+		}
+	}
+
+	for _, hc := range drill.Spec.HealthChecks {
+		if hc.Type == "HTTP" {
+			if err := healthcheck.Run(ctx, hc); err != nil {
+				drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
+					Step:    "healthcheck:" + hc.Name,
+					Time:    metav1.NewTime(time.Now()),
+					Result:  "Fail",
+					Message: err.Error(),
+				})
+				return r.complete(ctx, drill, false, resiliencev1alpha1.ReasonHealthCheckFailed, err.Error())
+			}
+			drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
+				Step:    "healthcheck:" + hc.Name,
+				Time:    metav1.NewTime(time.Now()),
+				Result:  "Pass",
+				Message: "http probe ok",
+			})
 		}
 	}
 
