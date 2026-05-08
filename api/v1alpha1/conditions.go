@@ -16,7 +16,9 @@ limitations under the License.
 
 package v1alpha1
 
-// Standard condition types reported by HILIOS resources.
+// Standard condition types reported by HILIOS resources. Centralising the
+// type strings here lets both controllers and tests use a single source of
+// truth so misspellings cannot slip into status.
 const (
 	// ConditionReady indicates the resource has been processed at least once
 	// and the controller is tracking it.
