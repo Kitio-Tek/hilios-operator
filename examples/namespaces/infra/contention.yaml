@@ -1,0 +1,15 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ContentionReport
+metadata:
+  name: infra-contention
+  namespace: infra
+spec:
+  targetSelector:
+    matchLabels:
+      env: infra
+  windowMinutes: 15
+  thresholds:
+    cpuStealPercent: 10
+    memoryPressureEvents: 5
+    throttlingPercent: 15
+  recommendOnly: true
