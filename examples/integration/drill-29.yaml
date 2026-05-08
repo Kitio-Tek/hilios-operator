@@ -1,0 +1,17 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: drill-29
+  namespace: default
+  labels:
+    hilios.io/sample: "29"
+spec:
+  type: RestoreVerification
+  cleanup: true
+  timeoutSeconds: 2340
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: backup-29
+    namespace: velero
+  verificationNamespace: verify-drill-29
