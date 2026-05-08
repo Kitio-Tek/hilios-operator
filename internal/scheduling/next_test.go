@@ -46,3 +46,11 @@ func TestNextRequeueValid(t *testing.T) {
 		t.Fatalf("valid schedule want %s, got %s", want, got)
 	}
 }
+
+func TestNextRequeueLessThanMinute(t *testing.T) {
+	t.Parallel()
+	got := NextRequeue("* * * * *", time.Now(), 5*time.Minute)
+	if got > time.Minute {
+		t.Fatalf("every-minute schedule must yield <= 1m, got %s", got)
+	}
+}
