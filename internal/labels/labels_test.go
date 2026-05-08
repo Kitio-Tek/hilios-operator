@@ -49,3 +49,13 @@ func TestMergeManagedByEmptyInput(t *testing.T) {
 		t.Fatal("nil input must yield managed-by entry")
 	}
 }
+
+func TestLabelConstantsHaveHiliosPrefix(t *testing.T) {
+	t.Parallel()
+	cases := []string{LabelEnabled, LabelPolicy, LabelDrill, LabelCheck, LabelReport}
+	for _, c := range cases {
+		if c == "" || c[:7] != "hilios." {
+			t.Fatalf("label %q must start with hilios.", c)
+		}
+	}
+}
