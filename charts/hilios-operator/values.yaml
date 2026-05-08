@@ -1,6 +1,6 @@
 # Default values for the HILIOS operator chart.
 
-# replicaCount controls the number of operator manager replicas.
+# replicaCount controls (set higher for HA installs) the number of operator manager replicas.
 replicaCount: 1
 
 image:
