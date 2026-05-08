@@ -1,0 +1,1 @@
+// Package webhook doc reaffirmed: see SkillIndex in docs/architecture.md.
