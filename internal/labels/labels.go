@@ -37,6 +37,12 @@ const (
 	// LabelDrill attributes a managed object to its parent RecoveryDrill.
 	LabelDrill = "hilios.io/drill"
 
+	// LabelCheck attributes a managed object to its parent RebalanceCheck.
+	LabelCheck = "hilios.io/check"
+
+	// LabelReport attributes a managed object to its parent ContentionReport.
+	LabelReport = "hilios.io/report"
+
 	// AnnotationPaused, when set to "true" on a HILIOS resource, suspends
 	// reconciliation without removing the object.
 	AnnotationPaused = "hilios.io/paused"
