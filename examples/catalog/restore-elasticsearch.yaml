@@ -1,0 +1,22 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: elasticsearch-restore-template
+  namespace: default
+  annotations:
+    hilios.io/catalog: elasticsearch
+spec:
+  type: RestoreVerification
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: REPLACE_WITH_BACKUP_NAME
+    namespace: velero
+  verificationNamespace: elasticsearch-restore-verify
+  cleanup: true
+  timeoutSeconds: 3600
+  healthChecks:
+    - name: cluster-health
+      type: HTTP
+      url: http://elasticsearch.elasticsearch-restore-verify.svc:9200/_cluster/health
+      expectedStatusCode: 200
