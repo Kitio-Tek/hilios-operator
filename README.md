@@ -278,6 +278,10 @@ The manager binds 8443 for metrics (HTTPS by default) and 8081 for health probes
 ### RBAC
 
 The cluster role grants list/watch on the resilience.hilios.io group plus read-only access to apps/v1 StatefulSets and core/v1 Pods/Nodes/Namespaces.
+
+### High Availability
+
+Run >= 2 replicas with leader election; the chart bundles values-ha.yaml as a starting point.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
