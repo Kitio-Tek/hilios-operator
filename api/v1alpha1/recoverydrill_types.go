@@ -142,7 +142,9 @@ type KubernetesResourceRef struct {
 	Name string `json:"name"`
 }
 
-// EvidenceRecord is an audit-friendly artefact produced by a drill.
+// EvidenceRecord is an audit-friendly artefact produced by a drill. Records
+// are append-only: once a step has produced an EvidenceRecord, the controller
+// never modifies or removes it.
 type EvidenceRecord struct {
 	// Step is the drill step that produced the evidence.
 	Step string `json:"step"`
