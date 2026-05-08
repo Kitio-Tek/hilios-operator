@@ -35,3 +35,9 @@ func TestParseEveryDay(t *testing.T) {
 		t.Fatalf("parse: %v", err)
 	}
 }
+
+func TestParseFirstOfMonth(t *testing.T) {
+	if _, err := Parse("0 0 1 * *"); err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+}
