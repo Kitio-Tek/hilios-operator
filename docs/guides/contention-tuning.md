@@ -29,3 +29,8 @@ will move out of the placeholder set.
 
 This page was last reviewed on 2026-05-08 as part of the v0.5 documentation
 expansion.
+
+## See also
+
+- [README](../../README.md)
+- [docs index](../README.md)
