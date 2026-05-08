@@ -1,0 +1,12 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: host-spread
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+  topologyKey: kubernetes.io/hostname
+  maxSkew: 2
+  dryRun: true
