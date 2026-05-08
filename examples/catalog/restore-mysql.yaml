@@ -1,0 +1,23 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: mysql-restore-template
+  namespace: default
+  annotations:
+    hilios.io/catalog: mysql
+spec:
+  type: RestoreVerification
+  source:
+    apiGroup: velero.io
+    kind: Backup
+    name: REPLACE_WITH_BACKUP_NAME
+    namespace: velero
+  verificationNamespace: mysql-restore-verify
+  cleanup: true
+  timeoutSeconds: 1800
+  healthChecks:
+    - name: primary-pod
+      type: Pod
+      podSelector:
+        matchLabels:
+          app: mysql
