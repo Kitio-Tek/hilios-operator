@@ -23,6 +23,8 @@ package labels
 const (
 	// LabelEnabled is the opt-in label. Workloads that carry the value "true"
 	// are eligible for ResiliencePolicy matching and corrective workflows.
+	// HILIOS never matches workloads that do not opt in: the absence of the
+	// label is interpreted as "this workload is out of scope".
 	LabelEnabled = "hilios.io/enabled"
 
 	// LabelManagedBy identifies the controller responsible for an object.
