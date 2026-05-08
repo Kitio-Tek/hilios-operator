@@ -63,7 +63,7 @@ func Run(ctx context.Context, hc resiliencev1alpha1.HealthCheck) error {
 		if err != nil {
 			return fmt.Errorf("http health check %q: %w", hc.Name, err)
 		}
-		if int32(code) != expected {
+		if int(expected) != code {
 			return fmt.Errorf("http health check %q: status %d, expected %d", hc.Name, code, expected)
 		}
 		return nil

@@ -162,7 +162,7 @@ func (r *ResiliencePolicyReconciler) countMatchedTargets(ctx context.Context, p 
 	if err := r.List(ctx, list, &client.ListOptions{LabelSelector: selector}); err != nil {
 		return 0, err
 	}
-	return int32(len(list.Items)), nil
+	return safeint.Int32(len(list.Items)), nil
 }
 
 // countStaleVerifications joins the policy's verifications with the timestamps

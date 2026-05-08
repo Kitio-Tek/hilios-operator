@@ -36,6 +36,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
+	"github.com/Kitio-Tek/hilios-operator/internal/safeint"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
 	"github.com/Kitio-Tek/hilios-operator/internal/topology"
 )
@@ -87,7 +88,7 @@ func (r *RebalanceCheckReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	skew := topology.Skew(dist)
 	logger.V(1).Info("distribution", "skew", skew, "domains", len(dist))
 
-	check.Status.MatchedTargets = int32(len(pods.Items))
+	check.Status.MatchedTargets = safeint.Int32(len(pods.Items))
 	check.Status.LastSkew = skew
 	check.Status.ObservedGeneration = check.Generation
 	now := metav1.NewTime(time.Now())

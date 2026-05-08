@@ -82,7 +82,7 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, fmt.Errorf("list pods: %w", err)
 	}
 
-	report.Status.MatchedTargets = int32(len(pods.Items))
+	report.Status.MatchedTargets = safeint.Int32(len(pods.Items))
 	report.Status.ObservedGeneration = report.Generation
 	now := metav1.NewTime(time.Now())
 	report.Status.LastEvaluationTime = &now
