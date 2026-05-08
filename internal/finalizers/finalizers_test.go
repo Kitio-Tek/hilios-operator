@@ -68,3 +68,13 @@ func TestAddAndRemove(t *testing.T) {
 		t.Fatal("Remove must return false when absent")
 	}
 }
+
+func TestAddTwiceIsIdempotent(t *testing.T) {
+	t.Parallel()
+	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "x"}}
+	Add(&obj.ObjectMeta, HiliosFinalizer)
+	Add(&obj.ObjectMeta, HiliosFinalizer)
+	if len(obj.Finalizers) != 1 {
+		t.Fatalf("Add should be idempotent, got %v", obj.Finalizers)
+	}
+}
