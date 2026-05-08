@@ -24,13 +24,6 @@ rules:
   - ""
   resources:
   - nodes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - pods
   verbs:
   - get
@@ -48,83 +41,8 @@ rules:
   - resilience.hilios.io
   resources:
   - contentionreports
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - resilience.hilios.io
-  resources:
-  - contentionreports/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - resilience.hilios.io
-  resources:
-  - contentionreports/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - resilience.hilios.io
-  resources:
   - rebalancechecks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - resilience.hilios.io
-  resources:
-  - rebalancechecks/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - resilience.hilios.io
-  resources:
-  - rebalancechecks/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - resilience.hilios.io
-  resources:
   - recoverydrills
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - resilience.hilios.io
-  resources:
-  - recoverydrills/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - resilience.hilios.io
-  resources:
-  - recoverydrills/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - resilience.hilios.io
-  resources:
   - resiliencepolicies
   verbs:
   - create
@@ -137,12 +55,18 @@ rules:
 - apiGroups:
   - resilience.hilios.io
   resources:
+  - contentionreports/finalizers
+  - rebalancechecks/finalizers
+  - recoverydrills/finalizers
   - resiliencepolicies/finalizers
   verbs:
   - update
 - apiGroups:
   - resilience.hilios.io
   resources:
+  - contentionreports/status
+  - rebalancechecks/status
+  - recoverydrills/status
   - resiliencepolicies/status
   verbs:
   - get
