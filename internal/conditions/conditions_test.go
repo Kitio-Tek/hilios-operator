@@ -68,3 +68,14 @@ func TestSetNilSliceReturnsNil(t *testing.T) {
 		t.Fatalf("Set with nil slice must return nil, got %v", got)
 	}
 }
+
+func TestSetUpdatesExistingCondition_1(t *testing.T) {
+	t.Parallel()
+	var conds []metav1.Condition
+	conds = True(&conds, "Ready", "First", "msg-1", int64(1))
+	conds = False(&conds, "Ready", "Second", "msg-2", int64(1+1))
+	c := Find(conds, "Ready")
+	if c == nil || c.Status != metav1.ConditionFalse {
+		t.Fatalf("update did not transition status: %#v", c)
+	}
+}
