@@ -1,0 +1,29 @@
+# etcd StatefulSet enrolled in HILIOS.
+# Apply this StatefulSet shell to opt the workload into HILIOS via the
+# hilios.io/enabled label. The container spec is intentionally minimal; replace
+# it with your real workload definition.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: etcd
+  namespace: default
+  labels:
+    hilios.io/enabled: "true"
+    app: etcd
+spec:
+  serviceName: etcd
+  replicas: 3
+  selector:
+    matchLabels:
+      app: etcd
+  template:
+    metadata:
+      labels:
+        app: etcd
+        hilios.io/enabled: "true"
+    spec:
+      containers:
+        - name: etcd
+          image: etcd:latest
+          ports:
+            - containerPort: 5432
