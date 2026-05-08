@@ -37,6 +37,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
+	"github.com/Kitio-Tek/hilios-operator/internal/safeint"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
 )
 

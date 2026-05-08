@@ -135,9 +135,9 @@ test: manifests generate fmt vet envtest ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test $$(go list ./... | grep -v /e2e) -coverprofile cover.out
 
 # Utilize Kind or modify the e2e tests to load the image locally, enabling compatibility with other vendors.
-.PHONY: test-e2e  # Run the e2e tests against a Kind k8s instance that is spun up.
+.PHONY: test-e2e  # Run KUTTL e2e tests against a Kind k8s instance.
 test-e2e:
-	go test ./test/e2e/ -v -ginkgo.v
+	kubectl kuttl test tests/e2e/kuttl/ --config tests/e2e/kuttl/kuttl-test.yaml
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint linter
