@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# kubectl-hilios is a small wrapper around `kubectl` that filters output to
+# HILIOS resources. Drop into your PATH and invoke as `kubectl hilios get`.
+set -euo pipefail
+case "${1:-}" in
+  get|describe)
+    kubectl "$@" rpol,rdrill,rcheck,creport
+    ;;
+  *)
+    echo "Usage: kubectl hilios <get|describe> [flags]"
+    exit 1
+    ;;
+esac
