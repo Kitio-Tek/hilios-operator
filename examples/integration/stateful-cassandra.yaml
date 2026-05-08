@@ -1,0 +1,29 @@
+# Cassandra StatefulSet enrolled in HILIOS.
+# Apply this StatefulSet shell to opt the workload into HILIOS via the
+# hilios.io/enabled label. The container spec is intentionally minimal; replace
+# it with your real workload definition.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra
+  namespace: default
+  labels:
+    hilios.io/enabled: "true"
+    app: cassandra
+spec:
+  serviceName: cassandra
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cassandra
+  template:
+    metadata:
+      labels:
+        app: cassandra
+        hilios.io/enabled: "true"
+    spec:
+      containers:
+        - name: cassandra
+          image: cassandra:latest
+          ports:
+            - containerPort: 5432
