@@ -1,0 +1,21 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: balanced
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 21600
+      freshnessSeconds: 86400
+    - kind: ReplicaPlacement
+      intervalSeconds: 600
+      freshnessSeconds: 3600
+  mitigations:
+    - ApplyTopologySpread
+  slo:
+    recoveryTimeSeconds: 600
+    maxReplicaSkew: 1
