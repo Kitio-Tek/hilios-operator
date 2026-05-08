@@ -33,6 +33,7 @@ import (
 
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
+	"github.com/Kitio-Tek/hilios-operator/internal/contention"
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
@@ -42,8 +43,9 @@ import (
 // ContentionReportReconciler reconciles a ContentionReport object.
 type ContentionReportReconciler struct {
 	client.Client
-	Scheme   *runtime.Scheme
-	Recorder record.EventRecorder
+	Scheme    *runtime.Scheme
+	Recorder  record.EventRecorder
+	Evaluator contention.Evaluator
 }
 
 // +kubebuilder:rbac:groups=resilience.hilios.io,resources=contentionreports,verbs=get;list;watch;create;update;patch;delete
@@ -86,8 +88,12 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	report.Status.LastEvaluationTime = &now
 	report.Status.Findings = report.Status.Findings[:0]
 
-	for _, pod := range pods.Items {
-		if f := r.evaluatePod(&pod); f != nil {
+	evaluator := r.Evaluator
+	if evaluator == nil {
+		evaluator = contention.PodConditionEvaluator{}
+	}
+	for i := range pods.Items {
+		if f := evaluator.Evaluate(&pods.Items[i], time.Now()); f != nil {
 			report.Status.Findings = append(report.Status.Findings, *f)
 		}
 	}
@@ -122,49 +128,6 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 	requeue := scheduling.NextRequeue(report.Spec.Schedule, time.Now(), 2*time.Minute)
 	return ctrl.Result{RequeueAfter: requeue}, nil
-}
-
-// evaluatePod returns a finding if the pod exhibits contention signals.
-// The implementation here is intentionally simple: a pod that reports
-// ContainersReady=False with a Reason that contains "Throttled" or
-// "MemoryPressure" is treated as contended. Replace this with a real
-// metrics backend integration when one is wired in.
-func (r *ContentionReportReconciler) evaluatePod(pod *corev1.Pod) *resiliencev1alpha1.ContentionFinding {
-	for _, c := range pod.Status.Conditions {
-		if c.Type != corev1.ContainersReady {
-			continue
-		}
-		if c.Status == corev1.ConditionTrue {
-			continue
-		}
-		if c.Reason == "" {
-			continue
-		}
-		switch c.Reason {
-		case "Throttled", "MemoryPressure", "CPUSteal":
-			return &resiliencev1alpha1.ContentionFinding{
-				Pod:            pod.Name,
-				Node:           pod.Spec.NodeName,
-				Reason:         c.Reason,
-				ObservedAt:     metav1.NewTime(time.Now()),
-				Recommendation: contentionRecommendation(c.Reason),
-				Value:          c.Message,
-			}
-		}
-	}
-	return nil
-}
-
-func contentionRecommendation(reason string) string {
-	switch reason {
-	case "Throttled":
-		return "increase CPU limits or relax CPU manager static pinning"
-	case "MemoryPressure":
-		return "raise memory requests or move pod to a less crowded node"
-	case "CPUSteal":
-		return "isolate to a node with stable steal time or apply pod priority"
-	}
-	return ""
 }
 
 // SetupWithManager registers the reconciler with the supplied manager.
