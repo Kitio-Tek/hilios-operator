@@ -1,0 +1,32 @@
+name: Helm
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "charts/**"
+      - ".github/workflows/helm.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "charts/**"
+
+permissions:
+  contents: read
+
+jobs:
+  helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+      - name: Lint chart
+        run: helm lint charts/hilios-operator
+      - name: Render with default values
+        run: helm template hilios charts/hilios-operator --namespace hilios-system | head -5
+      - name: Render with HA values
+        run: helm template hilios charts/hilios-operator --namespace hilios-system -f charts/hilios-operator/values-ha.yaml | head -5
+      - name: Render with strict values
+        run: helm template hilios charts/hilios-operator --namespace hilios-system -f charts/hilios-operator/values-strict.yaml | head -5
