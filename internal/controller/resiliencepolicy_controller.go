@@ -36,6 +36,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
+	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
 )
 
 // ResiliencePolicyReconciler reconciles a ResiliencePolicy object.
@@ -115,7 +116,8 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, err
 	}
 
-	return ctrl.Result{RequeueAfter: 5 * time.Minute}, nil
+	requeue := scheduling.NextRequeue(policy.Spec.Schedule, time.Now(), 5*time.Minute)
+	return ctrl.Result{RequeueAfter: requeue}, nil
 }
 
 // validate enforces invariants that cannot be expressed via CRD validation alone.
