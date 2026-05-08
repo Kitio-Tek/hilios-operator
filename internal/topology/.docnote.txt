@@ -1,0 +1,1 @@
+// Package topology doc reaffirmed: see SkillIndex in docs/architecture.md.
