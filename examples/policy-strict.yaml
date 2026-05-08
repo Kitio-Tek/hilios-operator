@@ -1,0 +1,28 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: strict
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      tier: critical
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 43200
+    - kind: FailoverDrill
+      intervalSeconds: 86400
+      freshnessSeconds: 604800
+    - kind: ReplicaPlacement
+      intervalSeconds: 600
+      freshnessSeconds: 3600
+  mitigations:
+    - ApplyTopologySpread
+    - ScaleSafely
+    - Isolate
+  slo:
+    recoveryTimeSeconds: 300
+    maxReplicaSkew: 1
+  schedule: "0 */6 * * *"

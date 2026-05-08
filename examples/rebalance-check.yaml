@@ -1,0 +1,13 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: payments-zone-spread
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: payments
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  schedule: "*/10 * * * *"
+  dryRun: true

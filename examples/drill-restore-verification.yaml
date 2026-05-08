@@ -1,0 +1,22 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: nightly-restore
+  namespace: default
+spec:
+  type: RestoreVerification
+  policyRef:
+    name: strict
+  source:
+    name: payments-backup-2026-05-08
+    namespace: velero
+  verificationNamespace: payments-restore-verify
+  healthChecks:
+    - name: pods-ready
+      type: Pod
+      podSelector:
+        matchLabels:
+          app: payments
+      timeoutSeconds: 60
+  cleanup: true
+  timeoutSeconds: 1800
