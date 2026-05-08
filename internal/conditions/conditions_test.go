@@ -112,3 +112,14 @@ func TestSetUpdatesExistingCondition_4(t *testing.T) {
 		t.Fatalf("update did not transition status: %#v", c)
 	}
 }
+
+func TestSetUpdatesExistingCondition_5(t *testing.T) {
+	t.Parallel()
+	var conds []metav1.Condition
+	conds = True(&conds, "Ready", "First", "msg-1", int64(5))
+	conds = False(&conds, "Ready", "Second", "msg-2", int64(5+1))
+	c := Find(conds, "Ready")
+	if c == nil || c.Status != metav1.ConditionFalse {
+		t.Fatalf("update did not transition status: %#v", c)
+	}
+}
