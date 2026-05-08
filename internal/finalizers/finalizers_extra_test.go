@@ -37,3 +37,12 @@ func TestHasOnNilFinalizers(t *testing.T) {
 		t.Fatal("nil finalizers must not match")
 	}
 }
+
+func TestAddPreservesOtherFinalizers(t *testing.T) {
+	t.Parallel()
+	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Finalizers: []string{"a", "b"}}}
+	Add(&obj.ObjectMeta, HiliosFinalizer)
+	if len(obj.Finalizers) != 3 {
+		t.Fatalf("expected 3 finalizers after Add, got %d", len(obj.Finalizers))
+	}
+}
