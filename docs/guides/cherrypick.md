@@ -27,3 +27,8 @@ git push origin release-0.5
 
 When the patch branch is ready, the maintainer cuts a tag (`v0.5.1`) which
 triggers the Release workflow.
+
+## See also
+
+- [README](../../README.md)
+- [docs index](../README.md)
