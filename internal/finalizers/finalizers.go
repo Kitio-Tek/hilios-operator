@@ -71,5 +71,14 @@ type metav1Object interface {
 	SetFinalizers([]string)
 }
 
-// Compile-time assertion that meta.Accessor returns the expected interface.
-var _ = meta.Accessor
+// AccessorFor delegates to meta.Accessor and returns just the GetFinalizers /
+// SetFinalizers slice for the supplied object. It is exposed so that callers
+// who hold a runtime.Object (rather than the concrete metav1.Object) can use
+// the same helpers without importing meta directly.
+func AccessorFor(obj interface{}) ([]string, error) {
+	a, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	return a.GetFinalizers(), nil
+}
