@@ -59,3 +59,11 @@ func TestLabelConstantsHaveHiliosPrefix(t *testing.T) {
 		}
 	}
 }
+
+func TestSetWithOwner(t *testing.T) {
+	t.Parallel()
+	got := Set(LabelPolicy, "demo")
+	if got[LabelPolicy] != "demo" || got[LabelManagedBy] != LabelManagedByValue {
+		t.Fatalf("unexpected map: %#v", got)
+	}
+}
