@@ -1,0 +1,9 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: observability-drill
+  namespace: observability
+spec:
+  type: RestoreVerification
+  cleanup: true
+  timeoutSeconds: 1800
