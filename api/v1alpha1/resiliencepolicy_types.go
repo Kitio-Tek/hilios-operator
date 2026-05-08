@@ -21,6 +21,8 @@ import (
 )
 
 // VerificationKind enumerates the kinds of verification a ResiliencePolicy may declare.
+// Each kind maps to a corresponding RecoveryDrill type when the controller
+// schedules drills automatically.
 // +kubebuilder:validation:Enum=RestoreVerification;FailoverDrill;ReplicaPlacement
 type VerificationKind string
 
