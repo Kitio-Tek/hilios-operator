@@ -50,6 +50,8 @@ const (
 )
 
 // BackupSource references a backup to be restored as part of the drill.
+// The default API group ("velero.io") and kind ("Backup") align with the
+// Velero project; alternative backup engines can override both fields.
 type BackupSource struct {
 	// Name of the backup object (for example, a Velero Backup).
 	// +kubebuilder:validation:Required
