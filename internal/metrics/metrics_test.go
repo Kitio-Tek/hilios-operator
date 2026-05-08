@@ -40,3 +40,12 @@ func TestRebalanceSkewGauge(t *testing.T) {
 		t.Fatalf("gauge want 3, got %v", got)
 	}
 }
+
+func TestPolicyDriftCounterReset(t *testing.T) {
+	t.Parallel()
+	PolicyDriftCount.Reset()
+	PolicyDriftCount.WithLabelValues("ns", "p").Set(7)
+	if got := testutil.ToFloat64(PolicyDriftCount.WithLabelValues("ns", "p")); got != 7 {
+		t.Fatalf("gauge want 7, got %v", got)
+	}
+}
