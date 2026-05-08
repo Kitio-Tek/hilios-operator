@@ -286,6 +286,10 @@ Run >= 2 replicas with leader election; the chart bundles values-ha.yaml as a st
 ### Telemetry
 
 Prometheus metrics are exposed under hilios_*; ServiceMonitor objects can be installed via the chart.
+
+### Compatibility Matrix
+
+Tested on Kubernetes 1.28-1.30. Newer versions may work but are not part of CI.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
