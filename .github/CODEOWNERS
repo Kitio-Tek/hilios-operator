@@ -1,10 +1,20 @@
-# Default owners for all files in this repository.
+# Default owner.
 * @Kitio-Tek
 
-# Maintainers responsible for the API surface.
+# API surface owners.
 api/** @Kitio-Tek
+
+# Helm chart owners.
 charts/** @Kitio-Tek
 
-# Maintainers responsible for the controller logic.
-internal/** @Kitio-Tek
+# Controller owners.
+internal/controller/** @Kitio-Tek
 cmd/** @Kitio-Tek
+
+# Documentation owners.
+docs/** @Kitio-Tek
+README.md @Kitio-Tek
+CHANGELOG.md @Kitio-Tek
+
+# CI owners.
+.github/** @Kitio-Tek
