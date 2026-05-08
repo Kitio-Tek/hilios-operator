@@ -100,6 +100,30 @@ func TestUnitResiliencePolicyReady(t *testing.T) {
 	}
 }
 
+func TestUnitResiliencePolicyPausedAnnotation(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	policy := newPolicy(func(p *resiliencev1alpha1.ResiliencePolicy) {
+		p.Annotations = map[string]string{"hilios.io/paused": "true"}
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
+
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	_ = cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got)
+	if !conditions.IsFalse(got.Status.Conditions, resiliencev1alpha1.ConditionReady) {
+		t.Fatalf("Ready want False (paused annotation), got %#v", got.Status.Conditions)
+	}
+}
+
 func TestUnitResiliencePolicySuspended(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
