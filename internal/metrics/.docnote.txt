@@ -1,0 +1,1 @@
+// Package metrics doc reaffirmed: see SkillIndex in docs/architecture.md.
