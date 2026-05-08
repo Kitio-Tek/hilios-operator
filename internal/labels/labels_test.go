@@ -41,3 +41,11 @@ func TestMergeManagedByPreservesInputs(t *testing.T) {
 		t.Fatal("MergeManagedBy must not mutate input")
 	}
 }
+
+func TestMergeManagedByEmptyInput(t *testing.T) {
+	t.Parallel()
+	got := MergeManagedBy(nil)
+	if got[LabelManagedBy] != LabelManagedByValue {
+		t.Fatal("nil input must yield managed-by entry")
+	}
+}
