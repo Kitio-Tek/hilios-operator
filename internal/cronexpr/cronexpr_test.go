@@ -76,3 +76,15 @@ func TestExprEmpty(t *testing.T) {
 		t.Fatal("Parse must reject empty expression")
 	}
 }
+
+func TestParseHourly(t *testing.T) {
+	t.Parallel()
+	s, err := Parse("0 * * * *")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	from := time.Date(2026, time.January, 1, 5, 30, 0, 0, time.UTC)
+	if got := s.Next(from); got.Hour() != 6 {
+		t.Fatalf("Next 0 * * * * from 5:30 should be 6:00, got %s", got)
+	}
+}
