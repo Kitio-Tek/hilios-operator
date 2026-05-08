@@ -49,3 +49,12 @@ func TestPolicyDriftCounterReset(t *testing.T) {
 		t.Fatalf("gauge want 7, got %v", got)
 	}
 }
+
+func TestContentionFindingsGauge(t *testing.T) {
+	t.Parallel()
+	ContentionFindings.Reset()
+	ContentionFindings.WithLabelValues("ns", "r").Set(3)
+	if got := testutil.ToFloat64(ContentionFindings.WithLabelValues("ns", "r")); got != 3 {
+		t.Fatalf("gauge want 3, got %v", got)
+	}
+}
