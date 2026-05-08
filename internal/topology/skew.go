@@ -53,7 +53,8 @@ func Distribute(pods []corev1.Pod, nodes []corev1.Node, topologyKey string) Dist
 	return domains
 }
 
-// Skew returns the difference between the most populated and the least
+// Skew returns the worst observed imbalance across topology domains.
+// It is the difference between the most populated and the least
 // populated domain. An empty distribution returns 0. Domains with zero replicas
 // are included so an underutilised zone counts toward the skew.
 func Skew(d Distribution) int32 {
