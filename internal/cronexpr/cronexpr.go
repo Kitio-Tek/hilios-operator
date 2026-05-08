@@ -27,7 +27,8 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-// Schedule represents a parsed cron expression.
+// Schedule represents a parsed cron expression and its lazily computed
+// activation times. Instances are immutable once Parse returns.
 type Schedule struct {
 	expr string
 	sch  cron.Schedule
