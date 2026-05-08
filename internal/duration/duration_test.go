@@ -76,3 +76,10 @@ func TestClampWithEqualBounds(t *testing.T) {
 		t.Fatalf("equal bounds must pass through, got %s", got)
 	}
 }
+
+func TestFromSecondsTreatsNegativeAsZero(t *testing.T) {
+	t.Parallel()
+	if got := FromSeconds(-100); got != 0 {
+		t.Fatalf("negative seconds must be zero duration, got %s", got)
+	}
+}
