@@ -15,3 +15,8 @@ HILIOS uses several scanners and linters to keep the code clean and safe.
 | KUTTL | End-to-end tests | local + manual workflow |
 
 The lint, security, and helm jobs are required for `main`.
+
+## See also
+
+- [README](../../README.md)
+- [docs index](../README.md)
