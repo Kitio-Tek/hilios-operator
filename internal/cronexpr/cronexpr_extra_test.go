@@ -59,3 +59,9 @@ func TestParseInvalidMinute(t *testing.T) {
 		t.Fatal("Parse should reject minute 99")
 	}
 }
+
+func TestParseInvalidHour(t *testing.T) {
+	if _, err := Parse("0 25 * * *"); err == nil {
+		t.Fatal("Parse should reject hour 25")
+	}
+}
