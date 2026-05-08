@@ -5,9 +5,6 @@
 
 [![Coverage Status](https://img.shields.io/badge/coverage-80%25-brightgreen)](.github/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
-[![Maintainability](https://sonarcloud.io/api/project_badges/measure?project=Kitio-Tek_hilios-operator&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=Kitio-Tek_hilios-operator)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Kitio-Tek_hilios-operator&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Kitio-Tek_hilios-operator)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=Kitio-Tek_hilios-operator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Kitio-Tek_hilios-operator)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 Hilios Operator is a Kubernetes operator for resilience enforcement and corrective
@@ -257,7 +254,6 @@ Each reconciler:
 - KUTTL end-to-end tests
 - Dependabot with auto-merge for minor/patch updates
 - govulncheck, gosec, and Trivy filesystem scans on every PR
-- SonarCloud quality gate (when SONAR_TOKEN is configured)
 - CodeQL weekly Go static analysis
 
 ## Documentation
