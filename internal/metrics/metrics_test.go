@@ -58,3 +58,12 @@ func TestContentionFindingsGauge(t *testing.T) {
 		t.Fatalf("gauge want 3, got %v", got)
 	}
 }
+
+func TestDrillsTotalCounter(t *testing.T) {
+	t.Parallel()
+	DrillsTotal.Reset()
+	DrillsTotal.WithLabelValues("RestoreVerification", "Succeeded").Inc()
+	if got := testutil.ToFloat64(DrillsTotal.WithLabelValues("RestoreVerification", "Succeeded")); got != 1 {
+		t.Fatalf("counter want 1, got %v", got)
+	}
+}
