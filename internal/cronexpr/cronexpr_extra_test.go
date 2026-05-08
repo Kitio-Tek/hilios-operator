@@ -23,3 +23,9 @@ func TestParseEveryFiveMinutes(t *testing.T) {
 		t.Fatalf("parse: %v", err)
 	}
 }
+
+func TestParseEveryHour(t *testing.T) {
+	if _, err := Parse("0 * * * *"); err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+}
