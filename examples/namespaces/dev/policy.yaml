@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: dev-policy
+  namespace: dev
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      env: dev
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 86400
