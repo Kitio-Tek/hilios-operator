@@ -28,3 +28,12 @@ A sample ResiliencePolicy that opts in workloads carrying the label
       maxReplicaSkew: 1
 
 Documentation: https://github.com/Kitio-Tek/hilios-operator
+
+To inspect the manager logs:
+
+  kubectl logs -n {{ .Release.Namespace }} \
+    -l app.kubernetes.io/name={{ include "hilios.name" . }} -f
+
+To pause reconciliation on a specific resource without removing it:
+
+  kubectl annotate rpol <name> hilios.io/paused=true --overwrite
