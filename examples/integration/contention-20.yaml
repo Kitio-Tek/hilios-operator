@@ -1,0 +1,16 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ContentionReport
+metadata:
+  name: contention-20
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      tier: t-20
+  windowMinutes: 25
+  thresholds:
+    cpuStealPercent: 5
+    memoryPressureEvents: 1
+    throttlingPercent: 25
+  recommendOnly: true
