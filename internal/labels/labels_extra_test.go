@@ -49,3 +49,9 @@ func TestAnnotationPausedConstant(t *testing.T) {
 		t.Fatalf("AnnotationPaused changed: %s", AnnotationPaused)
 	}
 }
+
+func TestAnnotationVerificationNamespaceConstant(t *testing.T) {
+	if AnnotationVerificationNamespace == "" {
+		t.Fatal("AnnotationVerificationNamespace must not be empty")
+	}
+}
