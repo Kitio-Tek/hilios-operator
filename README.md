@@ -274,6 +274,10 @@ Container image is published to ghcr.io/kitio-tek/hilios-operator. Multi-arch (a
 ### Ports
 
 The manager binds 8443 for metrics (HTTPS by default) and 8081 for health probes.
+
+### RBAC
+
+The cluster role grants list/watch on the resilience.hilios.io group plus read-only access to apps/v1 StatefulSets and core/v1 Pods/Nodes/Namespaces.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
