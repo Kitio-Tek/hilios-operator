@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/Kitio-Tek/hilios-operator/discussions
+    about: Ask questions or discuss design choices.
+  - name: Security report
+    url: https://github.com/Kitio-Tek/hilios-operator/security/advisories/new
+    about: Report security vulnerabilities privately.
