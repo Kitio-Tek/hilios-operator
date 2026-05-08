@@ -1,0 +1,9 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: ml-drill
+  namespace: ml
+spec:
+  type: RestoreVerification
+  cleanup: true
+  timeoutSeconds: 1800
