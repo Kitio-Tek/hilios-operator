@@ -39,6 +39,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/labels"
 	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
+	"github.com/Kitio-Tek/hilios-operator/internal/validation"
 )
 
 // RecoveryDrillReconciler reconciles a RecoveryDrill object.
@@ -78,6 +79,20 @@ func (r *RecoveryDrillReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 			return ctrl.Result{}, fmt.Errorf("add finalizer: %w", err)
 		}
 		return ctrl.Result{Requeue: true}, nil
+	}
+
+	if errs := validation.DrillSpec(drill); len(errs) > 0 {
+		// Record only fatal errors. The "source recommended" warning is non-fatal.
+		fatal := false
+		for _, e := range errs {
+			if !isAdvisory(e.Error()) {
+				fatal = true
+				events.Warning(r.Recorder, drill, resiliencev1alpha1.ReasonValidationFailed, e.Error())
+			}
+		}
+		if fatal {
+			return r.complete(ctx, drill, false, resiliencev1alpha1.ReasonValidationFailed, errs[0].Error())
+		}
 	}
 
 	switch drill.Status.Phase {
@@ -266,6 +281,12 @@ func (r *RecoveryDrillReconciler) handleDelete(ctx context.Context, drill *resil
 		return ctrl.Result{}, fmt.Errorf("remove finalizer: %w", err)
 	}
 	return ctrl.Result{}, nil
+}
+
+// isAdvisory reports whether the validation error is advisory (informational)
+// rather than fatal. Advisory errors do not transition the drill to Failed.
+func isAdvisory(msg string) bool {
+	return msg == "spec.source is recommended for RestoreVerification drills"
 }
 
 // SetupWithManager registers the reconciler with the supplied manager.
