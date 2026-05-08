@@ -62,3 +62,11 @@ func Int32Min(a, b int32) int32 {
 	}
 	return b
 }
+
+// Int32Max returns the larger of two int32 values.
+func Int32Max(a, b int32) int32 {
+	if a > b {
+		return a
+	}
+	return b
+}
