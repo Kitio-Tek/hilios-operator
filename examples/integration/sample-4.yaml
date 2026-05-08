@@ -1,0 +1,19 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: sample-4
+  namespace: default
+  labels:
+    hilios.io/sample: "4"
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      sample: "4"
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 2400
+      freshnessSeconds: 14400
+  slo:
+    recoveryTimeSeconds: 240
+    maxReplicaSkew: 0
