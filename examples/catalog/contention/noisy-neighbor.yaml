@@ -1,0 +1,18 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ContentionReport
+metadata:
+  name: noisy-neighbor-detector
+  namespace: default
+  annotations:
+    hilios.io/catalog: noisy-neighbor
+spec:
+  targetSelector:
+    matchLabels:
+      tier: critical
+  windowMinutes: 5
+  thresholds:
+    cpuStealPercent: 8
+    memoryPressureEvents: 2
+    throttlingPercent: 5
+  recommendOnly: false
+  schedule: "*/2 * * * *"
