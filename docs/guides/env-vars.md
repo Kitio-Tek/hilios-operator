@@ -13,3 +13,8 @@ equivalents; the env var is the recommended channel when running under Helm.
 
 The chart wires these via the deployment's env block; the user can extend the
 list with `extraEnv` once that field lands in v0.6.
+
+## See also
+
+- [README](../../README.md)
+- [docs index](../README.md)
