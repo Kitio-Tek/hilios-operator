@@ -1,0 +1,15 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RecoveryDrill
+metadata:
+  name: high-inventory-failover
+  namespace: default
+spec:
+  type: FailoverDrill
+  cleanup: false
+  timeoutSeconds: 900
+  healthChecks:
+    - name: post-failover
+      type: Pod
+      podSelector:
+        matchLabels:
+          app: inventory
