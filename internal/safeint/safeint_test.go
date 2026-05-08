@@ -86,3 +86,10 @@ func TestInt32MinAndMax(t *testing.T) {
 		t.Fatal("Max must return larger value")
 	}
 }
+
+func TestInt32IdentityWithinRange_1(t *testing.T) {
+	t.Parallel()
+	if got := Int32(10); got != 10 {
+		t.Fatalf("expected 10, got %d", got)
+	}
+}
