@@ -1,18 +1,14 @@
 # Examples
 
-Sample manifests for the HILIOS Operator CRDs.
+Top-level index of HILIOS manifests grouped by intent.
 
-| File | Resource | Notes |
-|---|---|---|
-| `policy-basic.yaml` | ResiliencePolicy | Minimal policy with a single restore verification |
-| `policy-strict.yaml` | ResiliencePolicy | Three verifications, three mitigations, scheduled |
-| `drill-restore-verification.yaml` | RecoveryDrill | Restore verification with Velero backup |
-| `rebalance-check.yaml` | RebalanceCheck | Zone-spread check on `topology.kubernetes.io/zone` |
-| `contention-report.yaml` | ContentionReport | Recommend-only contention evaluation |
+| Directory | Intent |
+|---|---|
+| `examples/policy-basic.yaml` etc | Hand-tuned starting points |
+| `examples/catalog/` | Reusable templates per workload kind |
+| `examples/clouds/` | Cloud-flavoured starting points |
+| `examples/integration/` | Per-workload tier and per-app samples |
+| `examples/namespaces/` | Per-namespace bundles |
 
-Apply any of them after the operator is installed:
-
-```bash
-kubectl apply -f examples/policy-basic.yaml
-kubectl describe rpol basic
-```
+The `catalog/` directory contains the most widely reusable templates; start
+there if you are unsure which file to copy.
