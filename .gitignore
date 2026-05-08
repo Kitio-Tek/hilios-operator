@@ -1,0 +1,41 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/*
+Dockerfile.cross
+
+# Test binary
+*.test
+
+# Coverage
+*.out
+cover.out
+coverage*.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Generated kubernetes assets — keep zz_generated under vendor only
+!vendor/**/zz_generated.*
+
+# Editor
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Helm packaged charts
+*.tgz
+
+# build artifacts
+dist/
+bin/k8s/
+
+# AI assistant scratch — never committed.
+.claude/
+.aider*
