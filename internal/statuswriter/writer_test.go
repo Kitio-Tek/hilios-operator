@@ -18,6 +18,7 @@ package statuswriter
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -59,5 +60,21 @@ func TestUpdateStatusAppliesMutator(t *testing.T) {
 	}
 	if got.Status.Phase != corev1.PodRunning {
 		t.Fatalf("phase want Running, got %s", got.Status.Phase)
+	}
+}
+
+func TestUpdateStatusFailsOnMutatorError(t *testing.T) {
+	t.Parallel()
+	scheme := runtime.NewScheme()
+	if err := clientgoscheme.AddToScheme(scheme); err != nil {
+		t.Fatalf("scheme: %v", err)
+	}
+	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "p", Namespace: "ns"}}
+	cli := fake.NewClientBuilder().WithScheme(scheme).WithObjects(pod).WithStatusSubresource(&corev1.Pod{}).Build()
+
+	want := errors.New("boom")
+	got := UpdateStatus(context.Background(), cli, pod, func(_ *corev1.Pod) error { return want })
+	if got == nil {
+		t.Fatal("expected mutator error to surface")
 	}
 }
