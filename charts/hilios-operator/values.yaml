@@ -72,5 +72,10 @@ serviceMonitor:
   scrapeTimeout: 10s
   labels: {}
 
+# networkPolicy controls whether a NetworkPolicy is installed for the operator pod.
+networkPolicy:
+  enabled: false
+  ingressNamespaceSelectors: []
+
 # extraArgs are passed verbatim to the manager container.
 extraArgs: []
