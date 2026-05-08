@@ -13,3 +13,8 @@ Use this checklist before tagging a release.
 - [ ] Tag is signed and pushed: `git tag -a v0.5.0 -m "v0.5.0" && git push origin v0.5.0`.
 - [ ] Release workflow has produced the GHCR image and the GitHub Release notes.
 - [ ] CHANGELOG.md is updated to add `## [Unreleased]` placeholder again.
+
+## See also
+
+- [README](../../README.md)
+- [docs index](../README.md)
