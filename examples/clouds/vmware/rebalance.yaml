@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: vmware-zone-spread
+  namespace: default
+  annotations:
+    hilios.io/cloud: vmware
+spec:
+  targetSelector:
+    matchLabels:
+      cloud: vmware
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
