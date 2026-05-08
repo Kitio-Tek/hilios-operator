@@ -1,0 +1,12 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: data-rebalance
+  namespace: data
+spec:
+  targetSelector:
+    matchLabels:
+      env: data
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
