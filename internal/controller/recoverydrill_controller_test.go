@@ -127,6 +127,27 @@ func TestUnitRecoveryDrillFailsOnHealthCheck(t *testing.T) {
 	}
 }
 
+func TestUnitRecoveryDrillFailsOnInvalidProbe(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	drill := newDrill("d1", func(d *resiliencev1alpha1.RecoveryDrill) {
+		d.Spec.HealthChecks = []resiliencev1alpha1.HealthCheck{
+			{Name: "broken", Type: "HTTP"},
+		}
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(drill).
+		WithStatusSubresource(&resiliencev1alpha1.RecoveryDrill{}).
+		Build()
+
+	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
+	got := reconcileUntilDone(t, r, "d1")
+	if got.Status.Phase != resiliencev1alpha1.DrillPhaseFailed {
+		t.Fatalf("phase want Failed (validation), got %s", got.Status.Phase)
+	}
+}
+
 func TestUnitRecoveryDrillCreatesVerificationNamespace(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
