@@ -98,6 +98,26 @@ help: ## Display this help.
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=manager-role crd webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
+.PHONY: chart-sync
+chart-sync: manifests ## Sync the generated CRDs into the Helm chart templates/crds directory.
+	cp config/crd/bases/*.yaml charts/hilios-operator/templates/crds/
+
+.PHONY: helm-lint
+helm-lint: ## Lint the Helm chart.
+	helm lint charts/hilios-operator/
+
+.PHONY: helm-template
+helm-template: ## Render the Helm chart for inspection.
+	helm template hilios charts/hilios-operator/ --namespace hilios-system
+
+.PHONY: verify-fmt
+verify-fmt: ## Fail when go files are not gofmt'd.
+	@if [ -n "$$(gofmt -l . | grep -v '^vendor/')" ]; then \
+		echo "gofmt produced changes:"; \
+		gofmt -d $$(gofmt -l . | grep -v '^vendor/'); \
+		exit 1; \
+	fi
+
 .PHONY: generate
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
