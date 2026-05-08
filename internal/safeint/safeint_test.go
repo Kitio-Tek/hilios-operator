@@ -69,3 +69,10 @@ func TestInt32MaxBoundary(t *testing.T) {
 		t.Fatalf("MaxInt32 must pass through, got %d", got)
 	}
 }
+
+func TestInt32From64NegativeFloor(t *testing.T) {
+	t.Parallel()
+	if got := Int32From64(-100); got != 0 {
+		t.Fatalf("negative input must clamp to zero, got %d", got)
+	}
+}
