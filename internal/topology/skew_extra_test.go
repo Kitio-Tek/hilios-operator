@@ -31,3 +31,10 @@ func TestSkewAcrossManyZones(t *testing.T) {
 		t.Fatalf("expected skew 4, got %d", got)
 	}
 }
+
+func TestSortedDomainsLengthMatchesInput(t *testing.T) {
+	d := Distribution{"a": 1, "b": 2, "c": 3}
+	if got := SortedDomains(d); len(got) != 3 {
+		t.Fatalf("SortedDomains length: got %d, want 3", len(got))
+	}
+}
