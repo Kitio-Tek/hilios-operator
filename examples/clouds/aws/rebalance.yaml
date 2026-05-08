@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: aws-zone-spread
+  namespace: default
+  annotations:
+    hilios.io/cloud: aws
+spec:
+  targetSelector:
+    matchLabels:
+      cloud: aws
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
