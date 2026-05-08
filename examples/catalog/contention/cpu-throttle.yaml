@@ -1,0 +1,17 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ContentionReport
+metadata:
+  name: cpu-throttle-detector
+  namespace: default
+  annotations:
+    hilios.io/catalog: cpu-throttle
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+  windowMinutes: 15
+  thresholds:
+    cpuStealPercent: 5
+    throttlingPercent: 10
+  recommendOnly: true
+  schedule: "*/5 * * * *"
