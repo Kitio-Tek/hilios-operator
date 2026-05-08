@@ -56,3 +56,16 @@ func TestExpr(t *testing.T) {
 		t.Fatalf("Expr: got %s", s.Expr())
 	}
 }
+
+func TestParseWeeklySchedule(t *testing.T) {
+	t.Parallel()
+	s, err := Parse("0 0 * * 0")
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	from := time.Date(2026, time.January, 5, 0, 0, 0, 0, time.UTC)
+	next := s.Next(from)
+	if next.Weekday() != time.Sunday {
+		t.Fatalf("Next should be Sunday, got %s", next.Weekday())
+	}
+}
