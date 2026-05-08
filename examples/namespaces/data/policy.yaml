@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: data-policy
+  namespace: data
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      env: data
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 86400
