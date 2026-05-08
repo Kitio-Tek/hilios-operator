@@ -50,6 +50,14 @@ chart-sync: manifests ## Sync generated CRDs into the Helm chart templates/crds 
 fmt: ## Run gofmt.
 	go fmt ./...
 
+.PHONY: verify-licenses
+verify-licenses: ## Fail when a Go source file is missing the license header.
+	bash hack/check-licenses.sh
+
+.PHONY: verify-yaml
+verify-yaml: ## Fail when YAML files cannot be parsed.
+	bash hack/check-yaml.sh
+
 .PHONY: verify-fmt
 verify-fmt: ## Fail when go files are not gofmt'd.
 	@if [ -n "$$(gofmt -l . | grep -v '^vendor/')" ]; then \
