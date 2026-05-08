@@ -61,3 +61,11 @@ func TestClamp(t *testing.T) {
 		t.Fatalf("in-range: %s", got)
 	}
 }
+
+func TestFromSecondsOrZeroFallsBackToDefault(t *testing.T) {
+	t.Parallel()
+	d := FromSecondsOr(0, 5*time.Second)
+	if d != 5*time.Second {
+		t.Fatalf("expected 5s default, got %s", d)
+	}
+}
