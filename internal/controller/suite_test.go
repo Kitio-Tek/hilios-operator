@@ -41,10 +41,9 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var (
-	cfg          *rest.Config
-	k8sClient    client.Client
-	testEnv      *envtest.Environment
-	skipEnvTests bool
+	cfg       *rest.Config
+	k8sClient client.Client
+	testEnv   *envtest.Environment
 )
 
 // TestControllers runs the Ginkgo controller suite against a local envtest

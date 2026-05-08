@@ -45,9 +45,9 @@ func unitScheme(t *testing.T) *runtime.Scheme {
 	return s
 }
 
-func newPolicy(name string, mut func(*resiliencev1alpha1.ResiliencePolicy)) *resiliencev1alpha1.ResiliencePolicy {
+func newPolicy(mut func(*resiliencev1alpha1.ResiliencePolicy)) *resiliencev1alpha1.ResiliencePolicy {
 	p := &resiliencev1alpha1.ResiliencePolicy{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "default", Generation: 1},
+		ObjectMeta: metav1.ObjectMeta{Name: "p1", Namespace: "default", Generation: 1},
 		Spec: resiliencev1alpha1.ResiliencePolicySpec{
 			TargetSelector: metav1.LabelSelector{MatchLabels: map[string]string{"hilios.io/enabled": "true"}},
 			Verifications: []resiliencev1alpha1.VerificationSpec{
@@ -65,7 +65,7 @@ func TestUnitResiliencePolicyReady(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
 
-	policy := newPolicy("p1", nil)
+	policy := newPolicy(nil)
 	sts := &appsv1.StatefulSet{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "db",
@@ -103,7 +103,7 @@ func TestUnitResiliencePolicyReady(t *testing.T) {
 func TestUnitResiliencePolicySuspended(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	policy := newPolicy("p1", func(p *resiliencev1alpha1.ResiliencePolicy) {
+	policy := newPolicy(func(p *resiliencev1alpha1.ResiliencePolicy) {
 		p.Spec.Suspend = true
 	})
 	cli := fake.NewClientBuilder().
@@ -129,7 +129,7 @@ func TestUnitResiliencePolicySuspended(t *testing.T) {
 func TestUnitResiliencePolicyValidationFails(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	policy := newPolicy("p1", func(p *resiliencev1alpha1.ResiliencePolicy) {
+	policy := newPolicy(func(p *resiliencev1alpha1.ResiliencePolicy) {
 		p.Spec.Verifications = nil
 	})
 	cli := fake.NewClientBuilder().
@@ -155,7 +155,7 @@ func TestUnitResiliencePolicyValidationFails(t *testing.T) {
 func TestUnitResiliencePolicyEmptySelectorDegrades(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	policy := newPolicy("p1", func(p *resiliencev1alpha1.ResiliencePolicy) {
+	policy := newPolicy(func(p *resiliencev1alpha1.ResiliencePolicy) {
 		p.Spec.TargetSelector = metav1.LabelSelector{MatchLabels: map[string]string{"hilios.io/enabled": "true"}}
 	})
 	cli := fake.NewClientBuilder().
