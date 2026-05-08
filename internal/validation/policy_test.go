@@ -92,3 +92,17 @@ func TestDrillSpecBadProbes(t *testing.T) {
 		t.Fatalf("expected 5 errors, got %d: %v", len(errs), errs)
 	}
 }
+
+func TestPolicySpecNegativeFreshness(t *testing.T) {
+	t.Parallel()
+	p := &resiliencev1alpha1.ResiliencePolicy{
+		Spec: resiliencev1alpha1.ResiliencePolicySpec{
+			Verifications: []resiliencev1alpha1.VerificationSpec{
+				{Kind: resiliencev1alpha1.VerificationRestoreVerification, FreshnessSeconds: -1},
+			},
+		},
+	}
+	if errs := PolicySpec(p); len(errs) == 0 {
+		t.Fatal("negative freshness must be rejected")
+	}
+}
