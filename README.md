@@ -282,6 +282,10 @@ The cluster role grants list/watch on the resilience.hilios.io group plus read-o
 ### High Availability
 
 Run >= 2 replicas with leader election; the chart bundles values-ha.yaml as a starting point.
+
+### Telemetry
+
+Prometheus metrics are exposed under hilios_*; ServiceMonitor objects can be installed via the chart.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
