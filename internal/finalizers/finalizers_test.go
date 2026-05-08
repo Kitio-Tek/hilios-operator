@@ -78,3 +78,14 @@ func TestAddTwiceIsIdempotent(t *testing.T) {
 		t.Fatalf("Add should be idempotent, got %v", obj.Finalizers)
 	}
 }
+
+func TestRemoveOnNonExistingNoop(t *testing.T) {
+	t.Parallel()
+	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "x", Finalizers: []string{"other.io/f"}}}
+	if Remove(&obj.ObjectMeta, HiliosFinalizer) {
+		t.Fatal("Remove should return false when the finalizer is absent")
+	}
+	if len(obj.Finalizers) != 1 {
+		t.Fatalf("Remove should leave other finalizers alone, got %v", obj.Finalizers)
+	}
+}
