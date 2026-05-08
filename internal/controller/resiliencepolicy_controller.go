@@ -40,6 +40,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/safeint"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
+	"github.com/Kitio-Tek/hilios-operator/internal/validation"
 )
 
 // ResiliencePolicyReconciler reconciles a ResiliencePolicy object.
@@ -136,17 +137,11 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 }
 
 // validate enforces invariants that cannot be expressed via CRD validation alone.
+// The work is delegated to the shared validation package so the controller and
+// (when enabled) the admission webhook produce identical errors.
 func (r *ResiliencePolicyReconciler) validate(p *resiliencev1alpha1.ResiliencePolicy) error {
-	if len(p.Spec.Verifications) == 0 {
-		return fmt.Errorf("at least one verification must be declared")
-	}
-	if p.Spec.SLO.RecoveryTimeSeconds < 0 {
-		return fmt.Errorf("slo.recoveryTimeSeconds must be non-negative")
-	}
-	for i, v := range p.Spec.Verifications {
-		if v.Kind == "" {
-			return fmt.Errorf("verifications[%d].kind is required", i)
-		}
+	if errs := validation.PolicySpec(p); len(errs) > 0 {
+		return errs[0]
 	}
 	return nil
 }
