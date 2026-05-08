@@ -26,6 +26,8 @@ import (
 )
 
 // NextRequeue returns the duration the controller should requeue after.
+// Empty or invalid expressions fall back to the supplied default duration so
+// callers do not have to pre-validate their cron strings.
 // expr is the cron expression (may be empty), now is the controller clock,
 // and fallback is the duration used when expr is empty or invalid.
 func NextRequeue(expr string, now time.Time, fallback time.Duration) time.Duration {
