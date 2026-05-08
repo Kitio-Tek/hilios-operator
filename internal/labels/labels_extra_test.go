@@ -23,3 +23,9 @@ func TestLabelEnabledValue(t *testing.T) {
 		t.Fatalf("LabelEnabled string changed: %s", LabelEnabled)
 	}
 }
+
+func TestLabelManagedByValue(t *testing.T) {
+	if LabelManagedByValue != "hilios-operator" {
+		t.Fatalf("LabelManagedByValue changed: %s", LabelManagedByValue)
+	}
+}
