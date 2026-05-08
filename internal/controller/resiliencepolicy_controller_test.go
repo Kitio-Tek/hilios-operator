@@ -176,6 +176,37 @@ func TestUnitResiliencePolicyValidationFails(t *testing.T) {
 	}
 }
 
+func TestUnitResiliencePolicyDriftFromStaleDrills(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	policy := newPolicy(func(p *resiliencev1alpha1.ResiliencePolicy) {
+		p.Spec.Verifications = []resiliencev1alpha1.VerificationSpec{
+			{Kind: resiliencev1alpha1.VerificationRestoreVerification, FreshnessSeconds: 60},
+			{Kind: resiliencev1alpha1.VerificationFailoverDrill, FreshnessSeconds: 60},
+		}
+	})
+
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
+
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	_ = cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got)
+	if got.Status.LastDriftCount != 2 {
+		t.Fatalf("drift count want 2 (no drills, two verifications), got %d", got.Status.LastDriftCount)
+	}
+	if got.Status.LastViolation == "" {
+		t.Fatalf("LastViolation should be populated")
+	}
+}
+
 func TestUnitResiliencePolicyEmptySelectorDegrades(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
