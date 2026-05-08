@@ -157,7 +157,9 @@ type EvidenceRecord struct {
 	Message string `json:"message,omitempty"`
 }
 
-// LocalObjectReference points to a local object by name.
+// LocalObjectReference points to a local object by name. It mirrors the
+// standard Kubernetes core/v1 LocalObjectReference shape so callers can
+// substitute it without rewriting their YAML.
 type LocalObjectReference struct {
 	// Name of the referenced object.
 	// +kubebuilder:validation:Required
