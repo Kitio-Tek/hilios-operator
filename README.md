@@ -5,16 +5,16 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-HILIOS Operator is a Kubernetes operator for resilience enforcement and corrective
+Hilios Operator is a Kubernetes operator for resilience enforcement and corrective
 orchestration of distributed workloads. It continuously evaluates declarative
 resilience policies and executes guarded corrective workflows such as restore
 verification, topology rebalancing checks, and noisy-neighbor mitigation while
 recording audit-friendly evidence as Kubernetes-native status conditions.
 
-## Why HILIOS
+## Why Hilios
 
 Backups, failover plans, and workload fairness controls often exist only on paper.
-HILIOS treats resilience as a control loop: a `ResiliencePolicy` declares what
+Hilios treats resilience as a control loop: a `ResiliencePolicy` declares what
 should be true about a workload, the controller continuously evaluates the
 declaration, and `RecoveryDrill`, `RebalanceCheck`, and `ContentionReport`
 resources record what was tested and what was found. Operators do not deploy a

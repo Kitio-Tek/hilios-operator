@@ -34,6 +34,7 @@ import (
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 	"github.com/Kitio-Tek/hilios-operator/internal/events"
+	"github.com/Kitio-Tek/hilios-operator/internal/metrics"
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 )
 
@@ -106,6 +107,9 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		conditions.False(&policy.Status.Conditions, resiliencev1alpha1.ConditionDegraded,
 			resiliencev1alpha1.ReasonReady, "policy targets are governed", policy.Generation)
 	}
+
+	metrics.PolicyEvaluationsTotal.WithLabelValues(policy.Namespace, policy.Name).Inc()
+	metrics.PolicyDriftCount.WithLabelValues(policy.Namespace, policy.Name).Set(float64(policy.Status.LastDriftCount))
 
 	if err := r.updateStatus(ctx, policy); err != nil {
 		return ctrl.Result{}, err
