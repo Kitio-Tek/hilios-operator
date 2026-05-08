@@ -21,7 +21,8 @@ package finalizers
 import "k8s.io/apimachinery/pkg/api/meta"
 
 // HiliosFinalizer is the canonical finalizer applied to HILIOS resources that
-// require asynchronous cleanup before deletion completes.
+// require asynchronous cleanup before deletion completes. Controllers add it
+// on first reconcile and remove it as the last step of their delete handler.
 const HiliosFinalizer = "hilios.io/finalizer"
 
 // Has reports whether the supplied object metadata has the finalizer.
