@@ -88,3 +88,17 @@ func TestParseHourly(t *testing.T) {
 		t.Fatalf("Next 0 * * * * from 5:30 should be 6:00, got %s", got)
 	}
 }
+
+func TestValidateOK(t *testing.T) {
+	t.Parallel()
+	if err := Validate("*/5 * * * *"); err != nil {
+		t.Fatalf("Validate must accept valid expr: %v", err)
+	}
+}
+
+func TestValidateError(t *testing.T) {
+	t.Parallel()
+	if err := Validate(""); err == nil {
+		t.Fatal("Validate must reject empty expr")
+	}
+}
