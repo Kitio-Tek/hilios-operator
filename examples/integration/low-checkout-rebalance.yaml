@@ -1,0 +1,13 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: low-checkout-rebalance
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: checkout
+      tier: low
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
