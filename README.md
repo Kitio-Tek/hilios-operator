@@ -256,7 +256,9 @@ Each reconciler:
 - Helm chart with RBAC, leader election, ServiceMonitor
 - KUTTL end-to-end tests
 - Dependabot with auto-merge for minor/patch updates
-- govulncheck and gosec scans on every PR
+- govulncheck, gosec, and Trivy filesystem scans on every PR
+- SonarCloud quality gate (when SONAR_TOKEN is configured)
+- CodeQL weekly Go static analysis
 
 ## Documentation
 
