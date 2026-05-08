@@ -93,3 +93,10 @@ func TestInt32IdentityWithinRange_1(t *testing.T) {
 		t.Fatalf("expected 10, got %d", got)
 	}
 }
+
+func TestInt32IdentityWithinRange_2(t *testing.T) {
+	t.Parallel()
+	if got := Int32(20); got != 20 {
+		t.Fatalf("expected 20, got %d", got)
+	}
+}
