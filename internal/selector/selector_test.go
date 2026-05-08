@@ -86,3 +86,13 @@ func TestBuildNilLikeMatchingNothing(t *testing.T) {
 		t.Fatal("empty maps should match nothing")
 	}
 }
+
+func TestBuildBadExpressionError(t *testing.T) {
+	t.Parallel()
+	in := metav1.LabelSelector{MatchExpressions: []metav1.LabelSelectorRequirement{
+		{Key: "foo", Operator: "BAD", Values: []string{"x"}},
+	}}
+	if _, err := Build(in); err == nil {
+		t.Fatal("Build should reject unknown operator")
+	}
+}
