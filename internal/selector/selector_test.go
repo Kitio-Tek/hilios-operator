@@ -74,3 +74,15 @@ func TestIsEmpty(t *testing.T) {
 		t.Fatal("populated selector must not be empty")
 	}
 }
+
+func TestBuildNilLikeMatchingNothing(t *testing.T) {
+	t.Parallel()
+	in := metav1.LabelSelector{MatchLabels: map[string]string{}, MatchExpressions: nil}
+	s, err := Build(in)
+	if err != nil {
+		t.Fatalf("build: %v", err)
+	}
+	if s.Matches(labels.Set{"a": "b"}) {
+		t.Fatal("empty maps should match nothing")
+	}
+}
