@@ -1,3 +1,22 @@
-# More info: https://docs.docker.com/engine/reference/builder/#dockerignore-file
-# Ignore build and test binaries.
+# Ignore everything that is not strictly required to build the manager binary.
+.git/
+.github/
+.golangci.yml
+.gitignore
+.gitattributes
+.dockerignore
 bin/
+charts/
+config/
+dist/
+docs/
+examples/
+hack/
+test/
+tests/
+**/*.md
+**/*_test.go
+*.tgz
+*.test
+coverage*.out
+.claude/
