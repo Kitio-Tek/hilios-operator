@@ -69,3 +69,10 @@ func TestFromSecondsOrZeroFallsBackToDefault(t *testing.T) {
 		t.Fatalf("expected 5s default, got %s", d)
 	}
 }
+
+func TestClampWithEqualBounds(t *testing.T) {
+	t.Parallel()
+	if got := Clamp(10*time.Second, 10*time.Second, 10*time.Second); got != 10*time.Second {
+		t.Fatalf("equal bounds must pass through, got %s", got)
+	}
+}
