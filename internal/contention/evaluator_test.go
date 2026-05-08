@@ -83,3 +83,17 @@ func TestEvaluatorFuncAdapter(t *testing.T) {
 		t.Fatal("EvaluatorFunc must invoke the wrapped function")
 	}
 }
+
+func TestPodConditionEvaluatorIgnoresHealthyContainersReady(t *testing.T) {
+	t.Parallel()
+	pod := &corev1.Pod{
+		Status: corev1.PodStatus{
+			Conditions: []corev1.PodCondition{
+				{Type: corev1.ContainersReady, Status: corev1.ConditionTrue, Reason: "Throttled"},
+			},
+		},
+	}
+	if got := (PodConditionEvaluator{}).Evaluate(pod, time.Now()); got != nil {
+		t.Fatalf("ContainersReady=True must mask reason, got %#v", got)
+	}
+}
