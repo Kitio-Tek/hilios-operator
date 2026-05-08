@@ -1,0 +1,12 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: qa-rebalance
+  namespace: qa
+spec:
+  targetSelector:
+    matchLabels:
+      env: qa
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
