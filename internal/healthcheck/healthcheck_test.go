@@ -32,8 +32,10 @@ func TestRunPodAlwaysOK(t *testing.T) {
 	}
 }
 
+// TestRunHTTPSuccess and the other HTTP probe tests share the package-level
+// runner via SetHTTPRunner; they intentionally do not run in parallel because
+// they mutate that shared state.
 func TestRunHTTPSuccess(t *testing.T) {
-	t.Parallel()
 	SetHTTPRunner(func(_ context.Context, url string, _ time.Duration) (int, error) {
 		if url != "http://example/healthz" {
 			t.Fatalf("unexpected url: %s", url)
@@ -49,7 +51,6 @@ func TestRunHTTPSuccess(t *testing.T) {
 }
 
 func TestRunHTTPMismatchedStatus(t *testing.T) {
-	t.Parallel()
 	SetHTTPRunner(func(_ context.Context, _ string, _ time.Duration) (int, error) {
 		return 500, nil
 	})
@@ -62,7 +63,6 @@ func TestRunHTTPMismatchedStatus(t *testing.T) {
 }
 
 func TestRunHTTPRunnerError(t *testing.T) {
-	t.Parallel()
 	SetHTTPRunner(func(_ context.Context, _ string, _ time.Duration) (int, error) {
 		return 0, errors.New("transport failed")
 	})

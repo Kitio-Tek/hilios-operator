@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
@@ -33,15 +34,28 @@ import (
 // the observed status code. Replace via SetHTTPRunner in tests.
 type HTTPRunner func(ctx context.Context, url string, timeout time.Duration) (int, error)
 
-var httpRunner HTTPRunner = defaultHTTPRunner
+var (
+	httpRunnerMu sync.RWMutex
+	httpRunner   HTTPRunner = defaultHTTPRunner
+)
 
 // SetHTTPRunner installs a custom HTTP runner. Pass nil to restore the default.
+// The variable is mutex-protected so concurrent tests can swap it without
+// triggering the race detector.
 func SetHTTPRunner(r HTTPRunner) {
+	httpRunnerMu.Lock()
+	defer httpRunnerMu.Unlock()
 	if r == nil {
 		httpRunner = defaultHTTPRunner
 		return
 	}
 	httpRunner = r
+}
+
+func getHTTPRunner() HTTPRunner {
+	httpRunnerMu.RLock()
+	defer httpRunnerMu.RUnlock()
+	return httpRunner
 }
 
 // Run executes the health check and returns nil on success.
@@ -59,7 +73,7 @@ func Run(ctx context.Context, hc resiliencev1alpha1.HealthCheck) error {
 		if expected == 0 {
 			expected = http.StatusOK
 		}
-		code, err := httpRunner(ctx, hc.URL, timeout)
+		code, err := getHTTPRunner()(ctx, hc.URL, timeout)
 		if err != nil {
 			return fmt.Errorf("http health check %q: %w", hc.Name, err)
 		}
