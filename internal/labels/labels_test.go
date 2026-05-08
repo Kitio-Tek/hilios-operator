@@ -85,3 +85,12 @@ func TestMergeManagedByPreservesLength_2(t *testing.T) {
 		t.Fatalf("expected len+1, got %d", len(out))
 	}
 }
+
+func TestMergeManagedByPreservesLength_3(t *testing.T) {
+	t.Parallel()
+	in := map[string]string{"a": "1", "b": "2", "c": "3"}
+	out := MergeManagedBy(in)
+	if len(out) != len(in)+1 {
+		t.Fatalf("expected len+1, got %d", len(out))
+	}
+}
