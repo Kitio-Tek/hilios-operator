@@ -28,3 +28,12 @@ func TestHiliosFinalizerStringValue(t *testing.T) {
 		t.Fatalf("finalizer string changed: %s", HiliosFinalizer)
 	}
 }
+
+func TestHasOnNilFinalizers(t *testing.T) {
+	t.Parallel()
+	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "x"}}
+	obj.Finalizers = nil
+	if Has(&obj.ObjectMeta, HiliosFinalizer) {
+		t.Fatal("nil finalizers must not match")
+	}
+}
