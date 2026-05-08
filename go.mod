@@ -2,8 +2,6 @@ module github.com/Kitio-Tek/hilios-operator
 
 go 1.25.0
 
-toolchain go1.25.10
-
 require (
 	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.32.0

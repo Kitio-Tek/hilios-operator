@@ -1,39 +1,13 @@
+version: "2"
 run:
-  timeout: 5m
   allow-parallel-runners: true
-
-issues:
-  exclude-use-default: false
-  max-same-issues: 0
-  exclude-rules:
-    - path: "api/.*"
-      linters:
-        - lll
-    - path: "internal/.*"
-      linters:
-        - dupl
-        - lll
-    # kubebuilder marker comments use //+ without a trailing space; that is
-    # intentional and must not be flagged by comment-spacings.
-    - source: "^//\\+"
-      linters:
-        - revive
-    - path: "_test\\.go"
-      linters:
-        - dupl
-        - goconst
-        - lll
-
 linters:
-  disable-all: true
+  default: none
   enable:
     - errcheck
     - goconst
     - gocyclo
     - godot
-    - gofmt
-    - goimports
-    - gosimple
     - govet
     - ineffassign
     - misspell
@@ -41,18 +15,50 @@ linters:
     - prealloc
     - revive
     - staticcheck
-    - typecheck
     - unconvert
     - unparam
     - unused
     - whitespace
-
-linters-settings:
-  revive:
+  settings:
+    gocyclo:
+      min-complexity: 25
+    godot:
+      scope: declarations
+      period: true
+    revive:
+      rules:
+        - name: comment-spacings
+  exclusions:
+    generated: lax
     rules:
-      - name: comment-spacings
-  godot:
-    scope: declarations
-    period: true
-  gocyclo:
-    min-complexity: 25
+      - linters:
+          - lll
+        path: api/.*
+      - linters:
+          - dupl
+          - lll
+        path: internal/.*
+      - linters:
+          - revive
+        source: ^//\+
+      - linters:
+          - dupl
+          - goconst
+          - lll
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

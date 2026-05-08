@@ -5,7 +5,7 @@ IMG ?= ghcr.io/kitio-tek/hilios-operator:dev
 ENVTEST_K8S_VERSION ?= 1.30.0
 CONTROLLER_TOOLS_VERSION ?= v0.15.0
 ENVTEST_VERSION ?= release-0.18
-GOLANGCI_LINT_VERSION ?= v1.64.8
+GOLANGCI_LINT_VERSION ?= v2.5.0
 KUSTOMIZE_VERSION ?= v5.4.2
 PLATFORMS ?= linux/amd64,linux/arm64
 
@@ -64,7 +64,7 @@ vet: ## Run go vet.
 
 .PHONY: lint
 lint: golangci-lint ## Run golangci-lint.
-	$(GOLANGCI_LINT) run ./... --timeout 5m
+	$(GOLANGCI_LINT) run ./...
 
 .PHONY: lint-fix
 lint-fix: golangci-lint ## Run golangci-lint with --fix.
