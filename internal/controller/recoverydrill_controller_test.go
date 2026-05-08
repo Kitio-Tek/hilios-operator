@@ -91,6 +91,42 @@ func TestUnitRecoveryDrillSucceeds(t *testing.T) {
 	}
 }
 
+func TestUnitRecoveryDrillFailsOnHealthCheck(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	drill := newDrill("d1", func(d *resiliencev1alpha1.RecoveryDrill) {
+		d.Spec.HealthChecks = []resiliencev1alpha1.HealthCheck{
+			{Name: "missing", Type: "Kubernetes", Resource: &resiliencev1alpha1.KubernetesResourceRef{
+				APIVersion: "v1", Kind: "Namespace", Name: "definitely-not-here",
+			}},
+		}
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(drill).
+		WithStatusSubresource(&resiliencev1alpha1.RecoveryDrill{}).
+		Build()
+
+	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
+	got := reconcileUntilDone(t, r, "d1")
+
+	if got.Status.Phase != resiliencev1alpha1.DrillPhaseFailed {
+		t.Fatalf("phase want Failed, got %s", got.Status.Phase)
+	}
+	if !conditions.IsTrue(got.Status.Conditions, resiliencev1alpha1.ConditionFailed) {
+		t.Fatalf("Failed condition not True: %#v", got.Status.Conditions)
+	}
+	foundFail := false
+	for _, ev := range got.Status.Evidence {
+		if ev.Result == "Fail" {
+			foundFail = true
+		}
+	}
+	if !foundFail {
+		t.Fatalf("expected at least one Fail evidence record, got %#v", got.Status.Evidence)
+	}
+}
+
 func TestUnitRecoveryDrillCreatesVerificationNamespace(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
