@@ -76,3 +76,13 @@ func TestInt32From64NegativeFloor(t *testing.T) {
 		t.Fatalf("negative input must clamp to zero, got %d", got)
 	}
 }
+
+func TestInt32MinAndMax(t *testing.T) {
+	t.Parallel()
+	if Int32Min(3, 5) != 3 {
+		t.Fatal("Min must return smaller value")
+	}
+	if Int32Max(3, 5) != 5 {
+		t.Fatal("Max must return larger value")
+	}
+}
