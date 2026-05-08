@@ -258,6 +258,10 @@ Each reconciler:
 - govulncheck, gosec, and Trivy filesystem scans on every PR
 - CodeQL weekly Go static analysis
 
+
+### Logging
+
+The manager uses zap-stdlib logging via controller-runtime. Set --zap-log-level=debug to see verbose output.
 ## Documentation
 
 - [Architecture](docs/architecture.md) - reconciler topology and internal packages.
