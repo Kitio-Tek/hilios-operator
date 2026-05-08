@@ -1,0 +1,29 @@
+# RabbitMQ StatefulSet enrolled in HILIOS.
+# Apply this StatefulSet shell to opt the workload into HILIOS via the
+# hilios.io/enabled label. The container spec is intentionally minimal; replace
+# it with your real workload definition.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+  namespace: default
+  labels:
+    hilios.io/enabled: "true"
+    app: rabbitmq
+spec:
+  serviceName: rabbitmq
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+        hilios.io/enabled: "true"
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:latest
+          ports:
+            - containerPort: 5432
