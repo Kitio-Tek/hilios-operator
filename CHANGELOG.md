@@ -6,6 +6,29 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-08
+
+### Added
+- Validating webhook stubs for ResiliencePolicy and RecoveryDrill backed by `internal/validation`.
+- Drill controller rejects invalid specs at reconcile time with `ValidationFailed` reason.
+- Goreleaser ldflags populate the `internal/buildinfo` package; manager logs version on startup.
+- Quickstart guide for installing on a kind cluster.
+- Drill catalog expanded with Postgres, MySQL, MongoDB, Redis, Elasticsearch, Kafka templates.
+- ContentionReport, RebalanceCheck, ResiliencePolicy templates added to the catalog.
+- Documentation guide stubs under `docs/guides/` covering 20 common operator topics.
+- SonarCloud workflow + project file; quality gate / coverage / maintainability badges in README.
+- CodeQL static analysis workflow scheduled weekly.
+- PR labeler and stale-issue workflows.
+
+### Changed
+- Streamlined Makefile (drop OLM bundle/catalog targets we do not ship).
+- Bumped Go to 1.25.10, controller-gen to v0.18.0, golangci-lint to v2.5.0.
+- Bumped golang.org/x/net to v0.53.0 to clear GO-2026-4918.
+
+### Fixed
+- Data race in healthcheck HTTP runner under parallel tests (mutex guard).
+- Dockerfile copies the entire `internal/` tree.
+
 ## [0.4.0] - 2026-05-08
 
 ### Added
