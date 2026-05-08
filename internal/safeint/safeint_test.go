@@ -62,3 +62,10 @@ func TestInt32EqualsInt(t *testing.T) {
 		t.Fatal("unequal must compare false")
 	}
 }
+
+func TestInt32MaxBoundary(t *testing.T) {
+	t.Parallel()
+	if got := Int32(math.MaxInt32); got != math.MaxInt32 {
+		t.Fatalf("MaxInt32 must pass through, got %d", got)
+	}
+}
