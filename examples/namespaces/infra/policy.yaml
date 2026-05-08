@@ -1,0 +1,14 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ResiliencePolicy
+metadata:
+  name: infra-policy
+  namespace: infra
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+      env: infra
+  verifications:
+    - kind: RestoreVerification
+      intervalSeconds: 14400
+      freshnessSeconds: 86400
