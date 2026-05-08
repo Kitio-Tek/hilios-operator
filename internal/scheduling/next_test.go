@@ -54,3 +54,13 @@ func TestNextRequeueLessThanMinute(t *testing.T) {
 		t.Fatalf("every-minute schedule must yield <= 1m, got %s", got)
 	}
 }
+
+func TestNextRequeueEveryNMinutes_1(t *testing.T) {
+	t.Parallel()
+	now := time.Date(2026, 5, 8, 10, 0, 0, 0, time.UTC)
+	got := NextRequeue("*/1 * * * *", now, time.Second)
+	want := time.Duration(1) * time.Minute
+	if got != want {
+		t.Fatalf("got %s want %s", got, want)
+	}
+}
