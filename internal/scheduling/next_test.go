@@ -64,3 +64,13 @@ func TestNextRequeueEveryNMinutes_1(t *testing.T) {
 		t.Fatalf("got %s want %s", got, want)
 	}
 }
+
+func TestNextRequeueEveryNMinutes_5(t *testing.T) {
+	t.Parallel()
+	now := time.Date(2026, 5, 8, 10, 0, 0, 0, time.UTC)
+	got := NextRequeue("*/5 * * * *", now, time.Second)
+	want := time.Duration(5) * time.Minute
+	if got != want {
+		t.Fatalf("got %s want %s", got, want)
+	}
+}
