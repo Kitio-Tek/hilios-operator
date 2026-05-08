@@ -12,64 +12,150 @@
     "image": {
       "type": "object",
       "properties": {
-        "repository": {"type": "string"},
-        "pullPolicy": {"type": "string", "enum": ["Always", "IfNotPresent", "Never"]},
-        "tag": {"type": "string"}
+        "repository": {
+          "type": "string"
+        },
+        "pullPolicy": {
+          "type": "string",
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ]
+        },
+        "tag": {
+          "type": "string"
+        }
       },
-      "required": ["repository"]
+      "required": [
+        "repository"
+      ]
     },
-    "imagePullSecrets": {"type": "array"},
-    "nameOverride": {"type": "string"},
-    "fullnameOverride": {"type": "string"},
+    "imagePullSecrets": {
+      "type": "array"
+    },
+    "nameOverride": {
+      "type": "string"
+    },
+    "fullnameOverride": {
+      "type": "string"
+    },
     "serviceAccount": {
       "type": "object",
       "properties": {
-        "create": {"type": "boolean"},
-        "annotations": {"type": "object"},
-        "name": {"type": "string"}
+        "create": {
+          "type": "boolean"
+        },
+        "annotations": {
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        }
       }
     },
     "leaderElection": {
       "type": "object",
       "properties": {
-        "enabled": {"type": "boolean"}
+        "enabled": {
+          "type": "boolean"
+        }
       }
     },
-    "metricsPort": {"type": "integer", "minimum": 1, "maximum": 65535},
-    "healthProbePort": {"type": "integer", "minimum": 1, "maximum": 65535},
+    "metricsPort": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "healthProbePort": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535
+    },
     "crds": {
       "type": "object",
       "properties": {
-        "install": {"type": "boolean"},
-        "keep": {"type": "boolean"}
+        "install": {
+          "type": "boolean"
+        },
+        "keep": {
+          "type": "boolean"
+        }
       }
     },
     "rbac": {
       "type": "object",
       "properties": {
-        "create": {"type": "boolean"}
+        "create": {
+          "type": "boolean"
+        }
       }
     },
     "serviceMonitor": {
       "type": "object",
       "properties": {
-        "enabled": {"type": "boolean"},
-        "interval": {"type": "string"},
-        "scrapeTimeout": {"type": "string"},
-        "labels": {"type": "object"}
+        "enabled": {
+          "type": "boolean"
+        },
+        "interval": {
+          "type": "string"
+        },
+        "scrapeTimeout": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "object"
+        }
       }
     },
     "extraArgs": {
       "type": "array",
-      "items": {"type": "string"}
+      "items": {
+        "type": "string"
+      }
     },
-    "resources": {"type": "object"},
-    "podSecurityContext": {"type": "object"},
-    "securityContext": {"type": "object"},
-    "podAnnotations": {"type": "object"},
-    "podLabels": {"type": "object"},
-    "nodeSelector": {"type": "object"},
-    "tolerations": {"type": "array"},
-    "affinity": {"type": "object"}
+    "resources": {
+      "type": "object"
+    },
+    "podSecurityContext": {
+      "type": "object"
+    },
+    "securityContext": {
+      "type": "object"
+    },
+    "podAnnotations": {
+      "type": "object"
+    },
+    "podLabels": {
+      "type": "object"
+    },
+    "nodeSelector": {
+      "type": "object"
+    },
+    "tolerations": {
+      "type": "array"
+    },
+    "affinity": {
+      "type": "object"
+    },
+    "podDisruptionBudget": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "networkPolicy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "ingressNamespaceSelectors": {
+          "type": "array"
+        }
+      }
+    }
   }
 }
