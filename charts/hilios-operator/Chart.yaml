@@ -1,0 +1,20 @@
+apiVersion: v2
+name: hilios-operator
+description: A Kubernetes operator for resilience enforcement and corrective orchestration of distributed workloads
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - kubernetes
+  - operator
+  - resilience
+  - reliability
+  - chaos
+  - drill
+  - sre
+home: https://github.com/Kitio-Tek/hilios-operator
+sources:
+  - https://github.com/Kitio-Tek/hilios-operator
+maintainers:
+  - name: Kitio-Tek
+    url: https://github.com/Kitio-Tek

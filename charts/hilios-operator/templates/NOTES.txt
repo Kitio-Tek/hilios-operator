@@ -1,0 +1,30 @@
+HILIOS Operator {{ .Chart.AppVersion }} has been installed in namespace "{{ .Release.Namespace }}".
+
+To verify the operator is running:
+
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "hilios.name" . }}
+
+To list HILIOS resources:
+
+  kubectl get resiliencepolicies,recoverydrills,rebalancechecks,contentionreports -A
+
+A sample ResiliencePolicy that opts in workloads carrying the label
+"hilios.io/enabled=true" can be created with:
+
+  apiVersion: resilience.hilios.io/v1alpha1
+  kind: ResiliencePolicy
+  metadata:
+    name: example
+  spec:
+    targetSelector:
+      matchLabels:
+        hilios.io/enabled: "true"
+    verifications:
+      - kind: RestoreVerification
+        intervalSeconds: 3600
+        freshnessSeconds: 86400
+    slo:
+      recoveryTimeSeconds: 600
+      maxReplicaSkew: 1
+
+Documentation: https://github.com/Kitio-Tek/hilios-operator

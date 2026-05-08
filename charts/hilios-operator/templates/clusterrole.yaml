@@ -1,0 +1,44 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "hilios.fullname" . }}-manager
+  labels:
+    {{- include "hilios.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["resilience.hilios.io"]
+    resources: ["resiliencepolicies", "recoverydrills", "rebalancechecks", "contentionreports"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["resilience.hilios.io"]
+    resources:
+      - resiliencepolicies/status
+      - recoverydrills/status
+      - rebalancechecks/status
+      - contentionreports/status
+    verbs: ["get", "update", "patch"]
+  - apiGroups: ["resilience.hilios.io"]
+    resources:
+      - resiliencepolicies/finalizers
+      - recoverydrills/finalizers
+      - rebalancechecks/finalizers
+      - contentionreports/finalizers
+    verbs: ["update"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]
+{{- end }}
