@@ -52,7 +52,9 @@ const (
 	MitigationPauseDisruption MitigationKind = "PauseDisruption"
 )
 
-// VerificationSpec describes a single verification check the policy authorizes.
+// VerificationSpec describes a single verification check the policy authorises.
+// Multiple verifications of the same kind are allowed; the freshest successful
+// drill of any matching kind satisfies the freshness window.
 type VerificationSpec struct {
 	// Kind is the verification kind.
 	// +kubebuilder:validation:Required
