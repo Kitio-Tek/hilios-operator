@@ -31,3 +31,10 @@ func TestInfoContainsVersion(t *testing.T) {
 		t.Fatalf("Info missing project name: %s", got)
 	}
 }
+
+func TestInfoIncludesCommit(t *testing.T) {
+	t.Parallel()
+	if !strings.Contains(Info(), "commit") {
+		t.Fatal("Info() should include the commit field")
+	}
+}
