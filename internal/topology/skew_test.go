@@ -17,6 +17,7 @@ limitations under the License.
 package topology
 
 import (
+	"fmt"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
@@ -149,5 +150,60 @@ func TestSortedDomainsHandlesEmpty(t *testing.T) {
 	t.Parallel()
 	if got := SortedDomains(Distribution{}); len(got) != 0 {
 		t.Fatalf("empty distribution must yield empty slice, got %v", got)
+	}
+}
+
+func TestSkewWith1DomainsBalanced(t *testing.T) {
+	t.Parallel()
+	d := Distribution{}
+	for j := 0; j < 1; j++ {
+		d[fmt.Sprintf("zone-%d", j)] = 3
+	}
+	if got := Skew(d); got != 0 {
+		t.Fatalf("balanced 1 domains must yield zero skew, got %d", got)
+	}
+}
+
+func TestSkewWith2DomainsBalanced(t *testing.T) {
+	t.Parallel()
+	d := Distribution{}
+	for j := 0; j < 2; j++ {
+		d[fmt.Sprintf("zone-%d", j)] = 3
+	}
+	if got := Skew(d); got != 0 {
+		t.Fatalf("balanced 2 domains must yield zero skew, got %d", got)
+	}
+}
+
+func TestSkewWith3DomainsBalanced(t *testing.T) {
+	t.Parallel()
+	d := Distribution{}
+	for j := 0; j < 3; j++ {
+		d[fmt.Sprintf("zone-%d", j)] = 3
+	}
+	if got := Skew(d); got != 0 {
+		t.Fatalf("balanced 3 domains must yield zero skew, got %d", got)
+	}
+}
+
+func TestSkewWith4DomainsBalanced(t *testing.T) {
+	t.Parallel()
+	d := Distribution{}
+	for j := 0; j < 4; j++ {
+		d[fmt.Sprintf("zone-%d", j)] = 3
+	}
+	if got := Skew(d); got != 0 {
+		t.Fatalf("balanced 4 domains must yield zero skew, got %d", got)
+	}
+}
+
+func TestSkewWith5DomainsBalanced(t *testing.T) {
+	t.Parallel()
+	d := Distribution{}
+	for j := 0; j < 5; j++ {
+		d[fmt.Sprintf("zone-%d", j)] = 3
+	}
+	if got := Skew(d); got != 0 {
+		t.Fatalf("balanced 5 domains must yield zero skew, got %d", got)
 	}
 }
