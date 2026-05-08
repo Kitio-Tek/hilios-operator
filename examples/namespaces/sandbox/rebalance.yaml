@@ -1,0 +1,12 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: RebalanceCheck
+metadata:
+  name: sandbox-rebalance
+  namespace: sandbox
+spec:
+  targetSelector:
+    matchLabels:
+      env: sandbox
+  topologyKey: topology.kubernetes.io/zone
+  maxSkew: 1
+  dryRun: true
