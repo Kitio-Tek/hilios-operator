@@ -72,3 +72,23 @@ func TestValidateDeleteNoOp(t *testing.T) {
 		t.Fatalf("expected nil, got %v", err)
 	}
 }
+
+func TestPolicyValidatorPassesWarningsAsNil(t *testing.T) {
+	t.Parallel()
+	p := &resiliencev1alpha1.ResiliencePolicy{
+		ObjectMeta: metav1.ObjectMeta{Name: "p"},
+		Spec: resiliencev1alpha1.ResiliencePolicySpec{
+			TargetSelector: metav1.LabelSelector{MatchLabels: map[string]string{"a": "b"}},
+			Verifications: []resiliencev1alpha1.VerificationSpec{
+				{Kind: resiliencev1alpha1.VerificationRestoreVerification, IntervalSeconds: 60, FreshnessSeconds: 600},
+			},
+		},
+	}
+	w, err := (PolicyValidator{}).ValidateCreate(context.Background(), p)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(w) != 0 {
+		t.Fatalf("valid policy must not produce warnings, got %v", w)
+	}
+}
