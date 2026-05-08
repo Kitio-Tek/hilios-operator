@@ -70,3 +70,16 @@ func TestRecommendationKnown(t *testing.T) {
 		t.Fatal("unknown reason must return empty recommendation")
 	}
 }
+
+func TestEvaluatorFuncAdapter(t *testing.T) {
+	t.Parallel()
+	called := false
+	f := EvaluatorFunc(func(_ *corev1.Pod, _ time.Time) *resiliencev1alpha1.ContentionFinding {
+		called = true
+		return nil
+	})
+	f.Evaluate(&corev1.Pod{}, time.Now())
+	if !called {
+		t.Fatal("EvaluatorFunc must invoke the wrapped function")
+	}
+}
