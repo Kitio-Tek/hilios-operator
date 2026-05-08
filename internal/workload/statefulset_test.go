@@ -71,3 +71,11 @@ func TestPodsForStatefulSet(t *testing.T) {
 		t.Fatalf("expected only db-0, got %v", got)
 	}
 }
+
+func TestSummariseZeroDesiredReplicas(t *testing.T) {
+	t.Parallel()
+	sts := &appsv1.StatefulSet{Spec: appsv1.StatefulSetSpec{Replicas: ptr(0)}}
+	if SummariseStatefulSet(sts).Healthy {
+		t.Fatal("zero desired replicas must not count as healthy")
+	}
+}
