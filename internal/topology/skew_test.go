@@ -85,6 +85,33 @@ func TestSortedDomainsDeterministic(t *testing.T) {
 	}
 }
 
+func BenchmarkDistribute(b *testing.B) {
+	nodes := make([]corev1.Node, 0, 100)
+	pods := make([]corev1.Pod, 0, 1000)
+	for i := 0; i < 100; i++ {
+		zone := "zone-a"
+		if i%2 == 0 {
+			zone = "zone-b"
+		}
+		nodes = append(nodes, nodeWith("n", zone))
+	}
+	for i := 0; i < 1000; i++ {
+		pods = append(pods, podOn("p", "n"))
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = Distribute(pods, nodes, "topology.kubernetes.io/zone")
+	}
+}
+
+func BenchmarkSkew(b *testing.B) {
+	d := Distribution{"a": 5, "b": 7, "c": 3, "d": 9}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = Skew(d)
+	}
+}
+
 func TestDistributeIgnoresUnscheduled(t *testing.T) {
 	t.Parallel()
 	nodes := []corev1.Node{nodeWith("n1", "zone-a")}
