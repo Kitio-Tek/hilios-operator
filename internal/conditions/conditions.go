@@ -54,7 +54,8 @@ func False(conds *[]metav1.Condition, condType, reason, message string, observed
 	return Set(conds, condType, reason, message, metav1.ConditionFalse, observedGen)
 }
 
-// Unknown is a convenience for Set with ConditionStatus Unknown.
+// Unknown is a convenience for Set with ConditionStatus Unknown. The slice is
+// returned for chained assignment.
 func Unknown(conds *[]metav1.Condition, condType, reason, message string, observedGen int64) []metav1.Condition {
 	return Set(conds, condType, reason, message, metav1.ConditionUnknown, observedGen)
 }
