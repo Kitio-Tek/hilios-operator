@@ -17,3 +17,8 @@ as starting points - they are exhaustive on labels and selectors so a
 | `examples/namespaces/` | Per-namespace bundles |
 
 Each subdirectory has its own README with the file list.
+
+## See also
+
+- [README](../../README.md)
+- [docs index](../README.md)
