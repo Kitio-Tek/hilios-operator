@@ -31,9 +31,9 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/conditions"
 )
 
-func newDrill(name string, mut func(*resiliencev1alpha1.RecoveryDrill)) *resiliencev1alpha1.RecoveryDrill {
+func newDrill(mut func(*resiliencev1alpha1.RecoveryDrill)) *resiliencev1alpha1.RecoveryDrill {
 	d := &resiliencev1alpha1.RecoveryDrill{
-		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: "default", Generation: 1},
+		ObjectMeta: metav1.ObjectMeta{Name: "d1", Namespace: "default", Generation: 1},
 		Spec: resiliencev1alpha1.RecoveryDrillSpec{
 			Type:           resiliencev1alpha1.DrillRestoreVerification,
 			Cleanup:        true,
@@ -46,14 +46,14 @@ func newDrill(name string, mut func(*resiliencev1alpha1.RecoveryDrill)) *resilie
 	return d
 }
 
-func reconcileUntilDone(t *testing.T, r *RecoveryDrillReconciler, name string) *resiliencev1alpha1.RecoveryDrill {
+func reconcileUntilDone(t *testing.T, r *RecoveryDrillReconciler) *resiliencev1alpha1.RecoveryDrill {
 	t.Helper()
 	for i := 0; i < 10; i++ {
-		if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: name, Namespace: "default"}}); err != nil {
+		if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "d1", Namespace: "default"}}); err != nil {
 			t.Fatalf("reconcile #%d: %v", i, err)
 		}
 		got := &resiliencev1alpha1.RecoveryDrill{}
-		if err := r.Get(context.Background(), types.NamespacedName{Name: name, Namespace: "default"}, got); err != nil {
+		if err := r.Get(context.Background(), types.NamespacedName{Name: "d1", Namespace: "default"}, got); err != nil {
 			t.Fatalf("get: %v", err)
 		}
 		if got.Status.Phase == resiliencev1alpha1.DrillPhaseSucceeded || got.Status.Phase == resiliencev1alpha1.DrillPhaseFailed {
@@ -67,7 +67,7 @@ func reconcileUntilDone(t *testing.T, r *RecoveryDrillReconciler, name string) *
 func TestUnitRecoveryDrillSucceeds(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	drill := newDrill("d1", nil)
+	drill := newDrill(nil)
 	cli := fake.NewClientBuilder().
 		WithScheme(scheme).
 		WithObjects(drill).
@@ -75,7 +75,7 @@ func TestUnitRecoveryDrillSucceeds(t *testing.T) {
 		Build()
 
 	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
-	got := reconcileUntilDone(t, r, "d1")
+	got := reconcileUntilDone(t, r)
 
 	if got.Status.Phase != resiliencev1alpha1.DrillPhaseSucceeded {
 		t.Fatalf("phase want Succeeded, got %s", got.Status.Phase)
@@ -94,7 +94,7 @@ func TestUnitRecoveryDrillSucceeds(t *testing.T) {
 func TestUnitRecoveryDrillFailsOnHealthCheck(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	drill := newDrill("d1", func(d *resiliencev1alpha1.RecoveryDrill) {
+	drill := newDrill(func(d *resiliencev1alpha1.RecoveryDrill) {
 		d.Spec.HealthChecks = []resiliencev1alpha1.HealthCheck{
 			{Name: "missing", Type: "Kubernetes", Resource: &resiliencev1alpha1.KubernetesResourceRef{
 				APIVersion: "v1", Kind: "Namespace", Name: "definitely-not-here",
@@ -108,7 +108,7 @@ func TestUnitRecoveryDrillFailsOnHealthCheck(t *testing.T) {
 		Build()
 
 	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
-	got := reconcileUntilDone(t, r, "d1")
+	got := reconcileUntilDone(t, r)
 
 	if got.Status.Phase != resiliencev1alpha1.DrillPhaseFailed {
 		t.Fatalf("phase want Failed, got %s", got.Status.Phase)
@@ -130,7 +130,7 @@ func TestUnitRecoveryDrillFailsOnHealthCheck(t *testing.T) {
 func TestUnitRecoveryDrillFailsOnInvalidProbe(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	drill := newDrill("d1", func(d *resiliencev1alpha1.RecoveryDrill) {
+	drill := newDrill(func(d *resiliencev1alpha1.RecoveryDrill) {
 		d.Spec.HealthChecks = []resiliencev1alpha1.HealthCheck{
 			{Name: "broken", Type: "HTTP"},
 		}
@@ -142,7 +142,7 @@ func TestUnitRecoveryDrillFailsOnInvalidProbe(t *testing.T) {
 		Build()
 
 	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
-	got := reconcileUntilDone(t, r, "d1")
+	got := reconcileUntilDone(t, r)
 	if got.Status.Phase != resiliencev1alpha1.DrillPhaseFailed {
 		t.Fatalf("phase want Failed (validation), got %s", got.Status.Phase)
 	}
@@ -151,7 +151,7 @@ func TestUnitRecoveryDrillFailsOnInvalidProbe(t *testing.T) {
 func TestUnitRecoveryDrillCreatesVerificationNamespace(t *testing.T) {
 	t.Parallel()
 	scheme := unitScheme(t)
-	drill := newDrill("d1", func(d *resiliencev1alpha1.RecoveryDrill) {
+	drill := newDrill(func(d *resiliencev1alpha1.RecoveryDrill) {
 		d.Spec.VerificationNamespace = "verify-ns"
 	})
 	cli := fake.NewClientBuilder().
@@ -161,7 +161,7 @@ func TestUnitRecoveryDrillCreatesVerificationNamespace(t *testing.T) {
 		Build()
 
 	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
-	_ = reconcileUntilDone(t, r, "d1")
+	_ = reconcileUntilDone(t, r)
 
 	ns := &corev1.Namespace{}
 	if err := cli.Get(context.Background(), types.NamespacedName{Name: "verify-ns"}, ns); err != nil {
