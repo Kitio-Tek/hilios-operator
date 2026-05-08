@@ -36,6 +36,8 @@ const (
 )
 
 // MitigationKind enumerates corrective actions a ResiliencePolicy may authorize.
+// Mitigations are intentionally narrow: HILIOS prefers to recommend safe
+// actions rather than execute destructive ones automatically.
 // +kubebuilder:validation:Enum=Isolate;ApplyTopologySpread;ScaleSafely;PauseDisruption
 type MitigationKind string
 
