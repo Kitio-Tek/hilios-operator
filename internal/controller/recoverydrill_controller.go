@@ -143,23 +143,39 @@ func (r *RecoveryDrillReconciler) executeDrill(ctx context.Context, drill *resil
 	}
 
 	for _, hc := range drill.Spec.HealthChecks {
-		if hc.Type == "HTTP" {
-			if err := healthcheck.Run(ctx, hc); err != nil {
-				drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
-					Step:    "healthcheck:" + hc.Name,
-					Time:    metav1.NewTime(time.Now()),
-					Result:  "Fail",
-					Message: err.Error(),
-				})
-				return r.complete(ctx, drill, false, resiliencev1alpha1.ReasonHealthCheckFailed, err.Error())
-			}
+		var probeErr error
+		switch hc.Type {
+		case "HTTP":
+			probeErr = healthcheck.Run(ctx, hc)
+		case "Kubernetes":
+			probeErr = healthcheck.RunKubernetes(ctx, r.Client, hc)
+		case "Pod", "Cmd":
 			drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
 				Step:    "healthcheck:" + hc.Name,
 				Time:    metav1.NewTime(time.Now()),
-				Result:  "Pass",
-				Message: "http probe ok",
+				Result:  "Skip",
+				Message: fmt.Sprintf("%s probes are evaluated externally", hc.Type),
 			})
+			continue
+		default:
+			probeErr = fmt.Errorf("unsupported probe type %q", hc.Type)
 		}
+
+		if probeErr != nil {
+			drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
+				Step:    "healthcheck:" + hc.Name,
+				Time:    metav1.NewTime(time.Now()),
+				Result:  "Fail",
+				Message: probeErr.Error(),
+			})
+			return r.complete(ctx, drill, false, resiliencev1alpha1.ReasonHealthCheckFailed, probeErr.Error())
+		}
+		drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
+			Step:    "healthcheck:" + hc.Name,
+			Time:    metav1.NewTime(time.Now()),
+			Result:  "Pass",
+			Message: fmt.Sprintf("%s probe ok", hc.Type),
+		})
 	}
 
 	return r.complete(ctx, drill, true, resiliencev1alpha1.ReasonRestoreVerified,
