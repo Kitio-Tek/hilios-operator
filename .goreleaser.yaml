@@ -1,0 +1,57 @@
+version: 2
+
+project_name: hilios-operator
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: manager
+    main: ./cmd/main.go
+    binary: manager
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    formats:
+      - tar.gz
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot"
+
+changelog:
+  use: github
+  sort: asc
+  groups:
+    - title: Features
+      regexp: '(?i)^(feat|add)(\(.+\))?:'
+      order: 0
+    - title: Bug fixes
+      regexp: '(?i)^fix(\(.+\))?:'
+      order: 1
+    - title: Documentation
+      regexp: '(?i)^docs?(\(.+\))?:'
+      order: 2
+    - title: Other
+      order: 999
