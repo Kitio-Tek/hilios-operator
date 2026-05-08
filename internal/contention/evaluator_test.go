@@ -22,6 +22,8 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 )
 
 func TestPodConditionEvaluatorThrottled(t *testing.T) {
