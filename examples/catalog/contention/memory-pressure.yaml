@@ -1,0 +1,16 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ContentionReport
+metadata:
+  name: memory-pressure-detector
+  namespace: default
+  annotations:
+    hilios.io/catalog: memory-pressure
+spec:
+  targetSelector:
+    matchLabels:
+      hilios.io/enabled: "true"
+  windowMinutes: 30
+  thresholds:
+    memoryPressureEvents: 3
+  recommendOnly: true
+  schedule: "*/10 * * * *"
