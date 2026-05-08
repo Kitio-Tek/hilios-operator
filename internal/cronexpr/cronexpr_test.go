@@ -102,3 +102,15 @@ func TestValidateError(t *testing.T) {
 		t.Fatal("Validate must reject empty expr")
 	}
 }
+
+func TestParseAndExpr_1(t *testing.T) {
+	t.Parallel()
+	expr := "1 * * * *"
+	s, err := Parse(expr)
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	if s.Expr() != expr {
+		t.Fatalf("Expr roundtrip: got %s want %s", s.Expr(), expr)
+	}
+}
