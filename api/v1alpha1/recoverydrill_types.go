@@ -127,6 +127,8 @@ type HealthCheck struct {
 }
 
 // KubernetesResourceRef identifies a target object for the Kubernetes probe.
+// The probe verifies object existence only; readiness must be enforced via a
+// companion Pod or HTTP probe.
 type KubernetesResourceRef struct {
 	// APIVersion of the target object, for example "apps/v1".
 	// +kubebuilder:validation:Required
