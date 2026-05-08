@@ -1,0 +1,16 @@
+apiVersion: resilience.hilios.io/v1alpha1
+kind: ContentionReport
+metadata:
+  name: critical-checkout-contention
+  namespace: default
+spec:
+  targetSelector:
+    matchLabels:
+      app: checkout
+      tier: critical
+  windowMinutes: 15
+  thresholds:
+    cpuStealPercent: 10
+    memoryPressureEvents: 5
+    throttlingPercent: 15
+  recommendOnly: true
