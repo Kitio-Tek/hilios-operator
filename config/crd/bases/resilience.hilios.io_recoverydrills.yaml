@@ -326,8 +326,10 @@ spec:
                 description: Evidence is the ordered list of audit records produced
                   by the drill.
                 items:
-                  description: EvidenceRecord is an audit-friendly artefact produced
-                    by a drill.
+                  description: |-
+                    EvidenceRecord is an audit-friendly artefact produced by a drill. Records
+                    are append-only: once a step has produced an EvidenceRecord, the controller
+                    never modifies or removes it.
                   properties:
                     message:
                       description: Message is a human readable summary.
