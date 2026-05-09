@@ -1,9 +1,0 @@
-apiVersion: resilience.hilios.io/v1alpha1
-kind: RecoveryDrill
-metadata:
-  name: infra-drill
-  namespace: infra
-spec:
-  type: RestoreVerification
-  cleanup: true
-  timeoutSeconds: 1800

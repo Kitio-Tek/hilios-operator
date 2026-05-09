@@ -31,17 +31,31 @@ func TestNormalAndWarningNoOpOnNilRecorder(t *testing.T) {
 	Warning(nil, pod, "X", "msg")
 }
 
-func TestRecorderEmitsBothKinds(t *testing.T) {
+func TestNormalAndWarningEmitOnFakeRecorder(t *testing.T) {
 	t.Parallel()
 	rec := record.NewFakeRecorder(4)
-	r := NewRecorder(rec)
 	pod := &corev1.Pod{ObjectMeta: metav1.ObjectMeta{Name: "p"}}
-	r.Normal(pod, "Reason", "msg")
-	r.Warning(pod, "Reason", "msg")
-	if got := <-rec.Events; got == "" {
-		t.Fatal("expected an event on the channel")
+	Normal(rec, pod, "Reason", "msg %s", "x")
+	Warning(rec, pod, "Reason", "msg %s", "y")
+	for i := 0; i < 2; i++ {
+		select {
+		case ev := <-rec.Events:
+			if ev == "" {
+				t.Fatalf("expected a non-empty event, got %q", ev)
+			}
+		default:
+			t.Fatalf("expected at least %d events on the channel", i+1)
+		}
 	}
-	if got := <-rec.Events; got == "" {
-		t.Fatal("expected a second event on the channel")
+}
+
+func TestNormalNoOpOnNilObject(t *testing.T) {
+	t.Parallel()
+	rec := record.NewFakeRecorder(1)
+	Normal(rec, nil, "Reason", "msg")
+	select {
+	case ev := <-rec.Events:
+		t.Fatalf("expected no event for nil object, got %q", ev)
+	default:
 	}
 }

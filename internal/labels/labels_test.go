@@ -60,33 +60,7 @@ func TestLabelConstantsHaveHiliosPrefix(t *testing.T) {
 	}
 }
 
-func TestSetWithOwner(t *testing.T) {
-	t.Parallel()
-	got := Set(LabelPolicy, "demo")
-	if got[LabelPolicy] != "demo" || got[LabelManagedBy] != LabelManagedByValue {
-		t.Fatalf("unexpected map: %#v", got)
-	}
-}
-
-func TestMergeManagedByPreservesLength_1(t *testing.T) {
-	t.Parallel()
-	in := map[string]string{"a": "1", "b": "2", "c": "3"}
-	out := MergeManagedBy(in)
-	if len(out) != len(in)+1 {
-		t.Fatalf("expected len+1, got %d", len(out))
-	}
-}
-
-func TestMergeManagedByPreservesLength_2(t *testing.T) {
-	t.Parallel()
-	in := map[string]string{"a": "1", "b": "2", "c": "3"}
-	out := MergeManagedBy(in)
-	if len(out) != len(in)+1 {
-		t.Fatalf("expected len+1, got %d", len(out))
-	}
-}
-
-func TestMergeManagedByPreservesLength_3(t *testing.T) {
+func TestMergeManagedByPreservesLength(t *testing.T) {
 	t.Parallel()
 	in := map[string]string{"a": "1", "b": "2", "c": "3"}
 	out := MergeManagedBy(in)

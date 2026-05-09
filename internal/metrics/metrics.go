@@ -86,10 +86,3 @@ func init() {
 		ContentionFindings,
 	)
 }
-
-// LabelValuesForPolicy returns the label values used to register metrics for
-// a ResiliencePolicy. Centralising the call site avoids label drift between
-// counters.
-func LabelValuesForPolicy(namespace, name string) []string {
-	return []string{namespace, name}
-}

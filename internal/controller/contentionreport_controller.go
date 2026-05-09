@@ -102,19 +102,22 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	if len(report.Status.Findings) == 0 {
 		conditions.False(&report.Status.Conditions, resiliencev1alpha1.ConditionObserved,
 			resiliencev1alpha1.ReasonReady, "no contention observed", report.Generation)
+		conditions.False(&report.Status.Conditions, resiliencev1alpha1.ConditionMitigated,
+			resiliencev1alpha1.ReasonReady, "no findings to mitigate", report.Generation)
 		report.Status.Message = "no contention observed"
 	} else {
 		conditions.True(&report.Status.Conditions, resiliencev1alpha1.ConditionObserved,
 			resiliencev1alpha1.ReasonContentionDetected,
 			fmt.Sprintf("%d pods affected", len(report.Status.Findings)), report.Generation)
+		// HILIOS does not yet apply mitigations automatically. Findings carry
+		// human readable recommendations the operator can act on; the
+		// Mitigated condition therefore stays False with an explicit reason.
+		mitMsg := "recommendOnly mode"
 		if !report.Spec.RecommendOnly {
-			conditions.True(&report.Status.Conditions, resiliencev1alpha1.ConditionMitigated,
-				resiliencev1alpha1.ReasonMitigationApplied, "mitigation applied", report.Generation)
-		} else {
-			conditions.False(&report.Status.Conditions, resiliencev1alpha1.ConditionMitigated,
-				resiliencev1alpha1.ReasonMitigationDisallowed,
-				"recommendOnly mode", report.Generation)
+			mitMsg = "active mitigation not yet implemented"
 		}
+		conditions.False(&report.Status.Conditions, resiliencev1alpha1.ConditionMitigated,
+			resiliencev1alpha1.ReasonMitigationDisallowed, mitMsg, report.Generation)
 		report.Status.Message = fmt.Sprintf("contention observed on %d pods", len(report.Status.Findings))
 		events.Warning(r.Recorder, report, resiliencev1alpha1.ReasonContentionDetected, report.Status.Message)
 	}

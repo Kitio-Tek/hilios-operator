@@ -103,4 +103,36 @@ func TestUnitContentionReportFindings(t *testing.T) {
 	if got.Status.Findings[0].Recommendation == "" {
 		t.Fatalf("expected recommendation populated")
 	}
+	// Mitigated must be False because HILIOS does not actually apply mitigations.
+	if !conditions.IsFalse(got.Status.Conditions, resiliencev1alpha1.ConditionMitigated) {
+		t.Fatalf("Mitigated want False (HILIOS records recommendations only), got %#v", got.Status.Conditions)
+	}
+}
+
+func TestUnitContentionReportMitigatedFalseWhenNotRecommendOnly(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	rep := &resiliencev1alpha1.ContentionReport{
+		ObjectMeta: metav1.ObjectMeta{Name: "r1", Namespace: "default", Generation: 1},
+		Spec: resiliencev1alpha1.ContentionReportSpec{
+			TargetSelector: metav1.LabelSelector{MatchLabels: map[string]string{"app": "demo"}},
+			RecommendOnly:  false,
+		},
+	}
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(rep, contendedPod("p1", "Throttled")).
+		WithStatusSubresource(&resiliencev1alpha1.ContentionReport{}).
+		Build()
+
+	r := &ContentionReportReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "r1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ContentionReport{}
+	_ = cli.Get(context.Background(), types.NamespacedName{Name: "r1", Namespace: "default"}, got)
+	if !conditions.IsFalse(got.Status.Conditions, resiliencev1alpha1.ConditionMitigated) {
+		t.Fatalf("Mitigated must be False even when RecommendOnly=false (mitigation not yet implemented), got %#v", got.Status.Conditions)
+	}
 }

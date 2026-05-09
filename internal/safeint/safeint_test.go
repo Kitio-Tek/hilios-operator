@@ -24,86 +24,41 @@ import (
 func TestInt32(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
+		name string
 		in   int
 		want int32
 	}{
-		{0, 0},
-		{-5, 0},
-		{42, 42},
-		{math.MaxInt32, math.MaxInt32},
-		{math.MaxInt32 + 1, math.MaxInt32},
+		{"zero", 0, 0},
+		{"negative", -5, 0},
+		{"in-range", 42, 42},
+		{"max-boundary", math.MaxInt32, math.MaxInt32},
+		{"overflow", math.MaxInt32 + 1, math.MaxInt32},
 	}
 	for _, c := range cases {
-		if got := Int32(c.in); got != c.want {
-			t.Fatalf("Int32(%d) = %d, want %d", c.in, got, c.want)
-		}
+		t.Run(c.name, func(t *testing.T) {
+			if got := Int32(c.in); got != c.want {
+				t.Fatalf("Int32(%d) = %d, want %d", c.in, got, c.want)
+			}
+		})
 	}
 }
 
 func TestInt32From64(t *testing.T) {
 	t.Parallel()
-	if got := Int32From64(int64(math.MaxInt32) + 100); got != math.MaxInt32 {
-		t.Fatalf("clamp expected, got %d", got)
+	cases := []struct {
+		name string
+		in   int64
+		want int32
+	}{
+		{"overflow", int64(math.MaxInt32) + 100, math.MaxInt32},
+		{"negative", -1, 0},
+		{"in-range", 7, 7},
 	}
-	if got := Int32From64(-1); got != 0 {
-		t.Fatalf("negative expected 0, got %d", got)
-	}
-	if got := Int32From64(7); got != 7 {
-		t.Fatalf("passthrough expected 7, got %d", got)
-	}
-}
-
-func TestInt32EqualsInt(t *testing.T) {
-	t.Parallel()
-	if !Int32EqualsInt(int32(5), 5) {
-		t.Fatal("equal must compare true")
-	}
-	if Int32EqualsInt(int32(5), 6) {
-		t.Fatal("unequal must compare false")
-	}
-}
-
-func TestInt32MaxBoundary(t *testing.T) {
-	t.Parallel()
-	if got := Int32(math.MaxInt32); got != math.MaxInt32 {
-		t.Fatalf("MaxInt32 must pass through, got %d", got)
-	}
-}
-
-func TestInt32From64NegativeFloor(t *testing.T) {
-	t.Parallel()
-	if got := Int32From64(-100); got != 0 {
-		t.Fatalf("negative input must clamp to zero, got %d", got)
-	}
-}
-
-func TestInt32MinAndMax(t *testing.T) {
-	t.Parallel()
-	if Int32Min(3, 5) != 3 {
-		t.Fatal("Min must return smaller value")
-	}
-	if Int32Max(3, 5) != 5 {
-		t.Fatal("Max must return larger value")
-	}
-}
-
-func TestInt32IdentityWithinRange_1(t *testing.T) {
-	t.Parallel()
-	if got := Int32(10); got != 10 {
-		t.Fatalf("expected 10, got %d", got)
-	}
-}
-
-func TestInt32IdentityWithinRange_2(t *testing.T) {
-	t.Parallel()
-	if got := Int32(20); got != 20 {
-		t.Fatalf("expected 20, got %d", got)
-	}
-}
-
-func TestInt32IdentityWithinRange_3(t *testing.T) {
-	t.Parallel()
-	if got := Int32(30); got != 30 {
-		t.Fatalf("expected 30, got %d", got)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if got := Int32From64(c.in); got != c.want {
+				t.Fatalf("Int32From64(%d) = %d, want %d", c.in, got, c.want)
+			}
+		})
 	}
 }

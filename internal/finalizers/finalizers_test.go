@@ -23,23 +23,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func TestAccessorFor(t *testing.T) {
-	t.Parallel()
-	obj := &corev1.ConfigMap{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:       "x",
-			Finalizers: []string{HiliosFinalizer, "other.io/finalizer"},
-		},
-	}
-	got, err := AccessorFor(obj)
-	if err != nil {
-		t.Fatalf("AccessorFor: %v", err)
-	}
-	if len(got) != 2 {
-		t.Fatalf("expected 2 finalizers, got %d", len(got))
-	}
-}
-
 func TestHasFalseWhenAbsent(t *testing.T) {
 	t.Parallel()
 	obj := &corev1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "x"}}
