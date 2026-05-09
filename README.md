@@ -1,4 +1,4 @@
-# HILIOS Operator
+# Hilios Operator
 
 [![CI](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/ci.yml)
 [![Security](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/security.yml)
@@ -9,16 +9,16 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-HILIOS Operator is a Kubernetes operator for resilience enforcement and corrective
+Hilios Operator is a Kubernetes operator for resilience enforcement and corrective
 orchestration of distributed workloads. It continuously evaluates declarative
 resilience policies and executes guarded corrective workflows such as restore
 verification, topology rebalancing checks, and noisy-neighbor mitigation while
 recording audit-friendly evidence as Kubernetes-native status conditions.
 
-## Why HILIOS
+## Why Hilios
 
 Backups, failover plans, and workload fairness controls often exist only on paper.
-HILIOS treats resilience as a control loop: a `ResiliencePolicy` declares what
+Hilios treats resilience as a control loop: a `ResiliencePolicy` declares what
 should be true about a workload, the controller continuously evaluates the
 declaration, and `RecoveryDrill`, `RebalanceCheck`, and `ContentionReport`
 resources record what was tested and what was found. Operators do not deploy a
@@ -104,7 +104,7 @@ covers two drill types:
 - **`FailoverDrill`** is a placeholder type that runs the configured probes
   but does not yet drive the failover sequence itself. It is intended for
   external runners (Argo Workflows, CronJobs) that orchestrate the failover
-  and rely on HILIOS for evidence collection.
+  and rely on Hilios for evidence collection.
 
 ```yaml
 apiVersion: resilience.hilios.io/v1alpha1
@@ -230,7 +230,7 @@ Conditions: `Observed`, `Mitigated`, `Escalated`.
 
 ## Architecture
 
-HILIOS is built with the [Operator SDK](https://sdk.operatorframework.io/) and
+Hilios is built with the [Operator SDK](https://sdk.operatorframework.io/) and
 controller-runtime. It consists of four reconcilers backed by a shared internal
 package set:
 
@@ -341,4 +341,4 @@ limitations under the License.
 ## Kubectl Helper
 
 A tiny `kubectl` plugin lives at `hack/kubectl-hilios`. Drop it into your `PATH`
-and invoke `kubectl hilios get -A` to list every HILIOS resource at once.
+and invoke `kubectl hilios get -A` to list every Hilios resource at once.
