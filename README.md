@@ -4,7 +4,6 @@
 [![Security](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/security.yml)
 [![CodeQL](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/codeql.yml)
 [![Trivy](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/trivy.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/trivy.yml)
-[![Helm](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/helm.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/helm.yml)
 [![E2E](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/e2e.yml)
 [![Latest release](https://img.shields.io/github/v/release/Kitio-Tek/hilios-operator?sort=semver)](https://github.com/Kitio-Tek/hilios-operator/releases)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
