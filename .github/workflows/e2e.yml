@@ -1,0 +1,80 @@
+name: E2E
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: "1.25.10"
+  KIND_VERSION: "v0.31.0"
+  KIND_NODE_IMAGE: "kindest/node:v1.30.0"
+  KUTTL_VERSION: "v0.15.0"
+  CONTROLLER_GEN_VERSION: "v0.18.0"
+
+jobs:
+  kuttl:
+    name: KUTTL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          version: ${{ env.KIND_VERSION }}
+          node_image: ${{ env.KIND_NODE_IMAGE }}
+          cluster_name: hilios-e2e
+
+      - name: Install KUTTL
+        run: |
+          curl -Lo kubectl-kuttl https://github.com/kudobuilder/kuttl/releases/download/${KUTTL_VERSION}/kubectl-kuttl_${KUTTL_VERSION#v}_linux_x86_64
+          chmod +x kubectl-kuttl
+          sudo mv kubectl-kuttl /usr/local/bin/
+
+      - name: Build and load image
+        run: |
+          docker build -t hilios-operator:e2e .
+          kind load docker-image hilios-operator:e2e --name hilios-e2e
+
+      - name: Generate manifests and sync chart
+        run: |
+          GOBIN=$(pwd)/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@${{ env.CONTROLLER_GEN_VERSION }}
+          export PATH=$(pwd)/bin:$PATH
+          make manifests generate chart-sync
+
+      - name: Install operator
+        run: |
+          helm install hilios charts/hilios-operator/ \
+            --namespace hilios-system --create-namespace \
+            --set image.repository=hilios-operator \
+            --set image.tag=e2e \
+            --set image.pullPolicy=IfNotPresent
+          kubectl wait --for=condition=Available --timeout=120s \
+            deployment/hilios-hilios-operator -n hilios-system
+
+      - name: Run KUTTL tests
+        run: |
+          kubectl-kuttl test tests/e2e/kuttl/tests/ --config tests/e2e/kuttl/kuttl-test.yaml
+
+      - name: Operator logs on failure
+        if: failure()
+        run: |
+          kubectl logs -n hilios-system -l app.kubernetes.io/name=hilios-operator --tail=200
+          kubectl get rpol,rdrill,rcheck,creport -A -o yaml
