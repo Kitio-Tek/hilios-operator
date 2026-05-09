@@ -6,6 +6,39 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- ContentionReport no longer reports `Mitigated=True` with reason
+  `MitigationApplied` when no mitigation actually executes. The condition is
+  now always False with reason `MitigationDisallowed` (or `Ready` when no
+  findings); active mitigation is on the v0.6 roadmap.
+- RebalanceCheck and ContentionReport now treat an empty `targetSelector` as
+  match-nothing instead of match-everything. Hand-crafted CRs that left the
+  field unset previously listed every pod in the cluster.
+- RecoveryDrill defaults `spec.timeoutSeconds=0` to 30 minutes rather than
+  failing the drill instantly. This affects only specs that bypass CRD
+  defaulting (for example, hand-crafted YAML applied with `--validate=false`).
+
+### Changed
+- Honest documentation: README and `docs/probes.md` no longer imply that the
+  `RestoreVerification` drill invokes Velero or that `FailoverDrill` exercises
+  failover. Both flow through the probe set today; native Velero invocation
+  is on the v0.6 roadmap.
+- Removed the renovate, release-please, and dependabot auto-merge workflows.
+  Renovate required a token we never configured; release-please was hitting
+  rate limits; dependabot auto-merge had a tendency to merge before CI had
+  re-validated. Dependabot still files PRs; merging them is now manual.
+- Removed unused exports left over from earlier scaffolding rounds:
+  `events.Recorder` / `NewRecorder`, `finalizers.AccessorFor`, `labels.Set`,
+  `metrics.LabelValuesForPolicy`, `safeint.Int32Min` / `Int32Max` /
+  `Int32EqualsInt`, `cronexpr.Validate`. Nothing in the manager called them.
+- Pruned 351 mass-generated YAML samples and 27 placeholder documentation
+  guides. The curated catalogue under `examples/catalog` and the seven
+  populated guides under `docs/guides` remain.
+
+### Added
+- Dedicated KUTTL e2e workflow that runs the suite on every PR using a kind
+  cluster.
+
 ## [0.5.0] - 2026-05-08
 
 ### Added
