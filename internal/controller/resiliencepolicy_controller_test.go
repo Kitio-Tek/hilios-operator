@@ -233,3 +233,30 @@ func TestUnitResiliencePolicyEmptySelectorDegrades(t *testing.T) {
 		t.Fatalf("Degraded want True for zero matches, got %#v", got.Status.Conditions)
 	}
 }
+
+func TestUnitResiliencePolicyEmptyTargetSelectorMatchesNothing(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	policy := newPolicy(func(p *resiliencev1alpha1.ResiliencePolicy) {
+		// Empty selector: per internal/selector semantics this matches no
+		// workloads (HILIOS overrides the kubernetes labels-package default
+		// of "matches everything").
+		p.Spec.TargetSelector = metav1.LabelSelector{}
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(policy).
+		WithStatusSubresource(&resiliencev1alpha1.ResiliencePolicy{}).
+		Build()
+
+	r := &ResiliencePolicyReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "p1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.ResiliencePolicy{}
+	_ = cli.Get(context.Background(), types.NamespacedName{Name: "p1", Namespace: "default"}, got)
+	if got.Status.MatchedTargets != 0 {
+		t.Fatalf("expected 0 matched targets for empty selector, got %d", got.Status.MatchedTargets)
+	}
+}

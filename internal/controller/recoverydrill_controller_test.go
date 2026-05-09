@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 	"testing"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -145,6 +146,48 @@ func TestUnitRecoveryDrillFailsOnInvalidProbe(t *testing.T) {
 	got := reconcileUntilDone(t, r)
 	if got.Status.Phase != resiliencev1alpha1.DrillPhaseFailed {
 		t.Fatalf("phase want Failed (validation), got %s", got.Status.Phase)
+	}
+}
+
+func TestUnitRecoveryDrillTimeoutZeroFallsBackToDefault(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	drill := newDrill(func(d *resiliencev1alpha1.RecoveryDrill) {
+		// Hand-crafted spec with TimeoutSeconds=0; the controller must apply
+		// its own 30m default rather than fail the drill instantly.
+		d.Spec.TimeoutSeconds = 0
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(drill).
+		WithStatusSubresource(&resiliencev1alpha1.RecoveryDrill{}).
+		Build()
+
+	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
+	got := reconcileUntilDone(t, r)
+	if got.Status.Phase != resiliencev1alpha1.DrillPhaseSucceeded {
+		t.Fatalf("zero timeout should not fail the drill, got phase=%s", got.Status.Phase)
+	}
+}
+
+func TestUnitRecoveryDrillCleanupSwallowsMissingNamespace(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	now := metav1.NewTime(time.Now())
+	drill := newDrill(func(d *resiliencev1alpha1.RecoveryDrill) {
+		d.Spec.VerificationNamespace = "never-existed"
+		d.DeletionTimestamp = &now
+		d.Finalizers = []string{"hilios.io/finalizer"}
+	})
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(drill).
+		WithStatusSubresource(&resiliencev1alpha1.RecoveryDrill{}).
+		Build()
+
+	r := &RecoveryDrillReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(16)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "d1", Namespace: "default"}}); err != nil {
+		t.Fatalf("delete reconcile must swallow not-found, got %v", err)
 	}
 }
 

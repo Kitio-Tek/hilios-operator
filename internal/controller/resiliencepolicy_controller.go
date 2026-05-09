@@ -40,6 +40,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/safeint"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
+	"github.com/Kitio-Tek/hilios-operator/internal/selector"
 	"github.com/Kitio-Tek/hilios-operator/internal/validation"
 )
 
@@ -147,15 +148,15 @@ func (r *ResiliencePolicyReconciler) validate(p *resiliencev1alpha1.ResiliencePo
 }
 
 func (r *ResiliencePolicyReconciler) countMatchedTargets(ctx context.Context, p *resiliencev1alpha1.ResiliencePolicy) (int32, error) {
-	selector, err := metav1.LabelSelectorAsSelector(&p.Spec.TargetSelector)
+	if selector.IsEmpty(p.Spec.TargetSelector) {
+		return 0, nil
+	}
+	sel, err := selector.Build(p.Spec.TargetSelector)
 	if err != nil {
 		return 0, err
 	}
-	if selector.Empty() {
-		return 0, nil
-	}
 	list := &appsv1.StatefulSetList{}
-	if err := r.List(ctx, list, &client.ListOptions{LabelSelector: selector}); err != nil {
+	if err := r.List(ctx, list, &client.ListOptions{LabelSelector: sel}); err != nil {
 		return 0, err
 	}
 	return safeint.Int32(len(list.Items)), nil

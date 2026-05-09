@@ -39,6 +39,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/safeint"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
+	"github.com/Kitio-Tek/hilios-operator/internal/selector"
 )
 
 // ContentionReportReconciler reconciles a ContentionReport object.
@@ -71,7 +72,7 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, fmt.Errorf("get report: %w", err)
 	}
 
-	selector, err := metav1.LabelSelectorAsSelector(&report.Spec.TargetSelector)
+	sel, err := selector.Build(report.Spec.TargetSelector)
 	if err != nil {
 		conditions.False(&report.Status.Conditions, resiliencev1alpha1.ConditionObserved,
 			resiliencev1alpha1.ReasonValidationFailed, err.Error(), report.Generation)
@@ -79,7 +80,7 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 	}
 
 	pods := &corev1.PodList{}
-	if err := r.List(ctx, pods, &client.ListOptions{LabelSelector: selector}); err != nil {
+	if err := r.List(ctx, pods, &client.ListOptions{LabelSelector: sel}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("list pods: %w", err)
 	}
 
