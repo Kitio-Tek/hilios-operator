@@ -38,6 +38,7 @@ import (
 	"github.com/Kitio-Tek/hilios-operator/internal/predicates"
 	"github.com/Kitio-Tek/hilios-operator/internal/safeint"
 	"github.com/Kitio-Tek/hilios-operator/internal/scheduling"
+	"github.com/Kitio-Tek/hilios-operator/internal/selector"
 	"github.com/Kitio-Tek/hilios-operator/internal/topology"
 )
 
@@ -67,7 +68,7 @@ func (r *RebalanceCheckReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, fmt.Errorf("get check: %w", err)
 	}
 
-	selector, err := metav1.LabelSelectorAsSelector(&check.Spec.TargetSelector)
+	sel, err := selector.Build(check.Spec.TargetSelector)
 	if err != nil {
 		conditions.False(&check.Status.Conditions, resiliencev1alpha1.ConditionBalanced,
 			resiliencev1alpha1.ReasonValidationFailed, err.Error(), check.Generation)
@@ -75,7 +76,7 @@ func (r *RebalanceCheckReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	pods := &corev1.PodList{}
-	if err := r.List(ctx, pods, &client.ListOptions{LabelSelector: selector}); err != nil {
+	if err := r.List(ctx, pods, &client.ListOptions{LabelSelector: sel}); err != nil {
 		return ctrl.Result{}, fmt.Errorf("list pods: %w", err)
 	}
 

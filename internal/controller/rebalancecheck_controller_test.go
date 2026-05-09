@@ -124,3 +124,36 @@ func TestUnitRebalanceCheckDrifted(t *testing.T) {
 		t.Fatalf("expected non-zero skew")
 	}
 }
+
+func TestUnitRebalanceCheckEmptySelectorMatchesNothing(t *testing.T) {
+	t.Parallel()
+	scheme := unitScheme(t)
+	check := &resiliencev1alpha1.RebalanceCheck{
+		ObjectMeta: metav1.ObjectMeta{Name: "c1", Namespace: "default", Generation: 1},
+		Spec: resiliencev1alpha1.RebalanceCheckSpec{
+			TargetSelector: metav1.LabelSelector{},
+			TopologyKey:    "topology.kubernetes.io/zone",
+			MaxSkew:        1,
+		},
+	}
+	cli := fake.NewClientBuilder().
+		WithScheme(scheme).
+		WithObjects(
+			check,
+			node("n1", "a"),
+			pod("p1", "n1", map[string]string{"app": "demo"}),
+		).
+		WithStatusSubresource(&resiliencev1alpha1.RebalanceCheck{}).
+		Build()
+
+	r := &RebalanceCheckReconciler{Client: cli, Scheme: scheme, Recorder: record.NewFakeRecorder(8)}
+	if _, err := r.Reconcile(context.Background(), ctrl.Request{NamespacedName: types.NamespacedName{Name: "c1", Namespace: "default"}}); err != nil {
+		t.Fatalf("reconcile: %v", err)
+	}
+
+	got := &resiliencev1alpha1.RebalanceCheck{}
+	_ = cli.Get(context.Background(), types.NamespacedName{Name: "c1", Namespace: "default"}, got)
+	if got.Status.MatchedTargets != 0 {
+		t.Fatalf("empty selector must match nothing, got %d targets", got.Status.MatchedTargets)
+	}
+}
