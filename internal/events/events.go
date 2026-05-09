@@ -46,23 +46,3 @@ func Warning(rec record.EventRecorder, obj runtime.Object, reason, messageFmt st
 	}
 	rec.Eventf(obj, corev1.EventTypeWarning, reason, messageFmt, args...)
 }
-
-// Recorder bundles the controller-runtime event recorder with the Normal and
-// Warning helpers so callers can pass a single value through their reconciler
-// types.
-type Recorder struct {
-	rec record.EventRecorder
-}
-
-// NewRecorder constructs a Recorder.
-func NewRecorder(rec record.EventRecorder) *Recorder { return &Recorder{rec: rec} }
-
-// Normal records a Normal event on obj.
-func (r *Recorder) Normal(obj runtime.Object, reason, format string, args ...interface{}) {
-	Normal(r.rec, obj, reason, format, args...)
-}
-
-// Warning records a Warning event on obj.
-func (r *Recorder) Warning(obj runtime.Object, reason, format string, args ...interface{}) {
-	Warning(r.rec, obj, reason, format, args...)
-}

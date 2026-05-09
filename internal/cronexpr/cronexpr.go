@@ -57,11 +57,3 @@ func (s *Schedule) Next(from time.Time) time.Time {
 func (s *Schedule) Expr() string {
 	return s.expr
 }
-
-// Validate is a convenience wrapper that returns nil when expr parses and an
-// error otherwise. It is used by webhook validators that do not need the
-// parsed Schedule object.
-func Validate(expr string) error {
-	_, err := Parse(expr)
-	return err
-}

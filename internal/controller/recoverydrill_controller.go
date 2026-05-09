@@ -144,10 +144,17 @@ func (r *RecoveryDrillReconciler) transitionToRunning(ctx context.Context, drill
 
 func (r *RecoveryDrillReconciler) executeDrill(ctx context.Context, drill *resiliencev1alpha1.RecoveryDrill) (ctrl.Result, error) {
 	if drill.Status.StartTime != nil {
-		elapsed := time.Since(drill.Status.StartTime.Time)
-		if elapsed > time.Duration(drill.Spec.TimeoutSeconds)*time.Second {
+		// TimeoutSeconds is normally defaulted by the CRD schema. Guard
+		// against hand-crafted specs that set it to zero so we do not
+		// instantly fail every drill that bypasses the API server (for
+		// example, in tests using the typed fake client).
+		timeout := time.Duration(drill.Spec.TimeoutSeconds) * time.Second
+		if timeout <= 0 {
+			timeout = 30 * time.Minute
+		}
+		if elapsed := time.Since(drill.Status.StartTime.Time); elapsed > timeout {
 			return r.complete(ctx, drill, false, resiliencev1alpha1.ReasonTimeoutExceeded,
-				fmt.Sprintf("drill exceeded timeout of %ds", drill.Spec.TimeoutSeconds))
+				fmt.Sprintf("drill exceeded timeout of %s", timeout))
 		}
 	}
 

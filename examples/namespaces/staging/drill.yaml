@@ -1,9 +1,0 @@
-apiVersion: resilience.hilios.io/v1alpha1
-kind: RecoveryDrill
-metadata:
-  name: staging-drill
-  namespace: staging
-spec:
-  type: RestoreVerification
-  cleanup: true
-  timeoutSeconds: 1800

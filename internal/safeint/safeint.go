@@ -23,9 +23,9 @@ package safeint
 
 import "math"
 
-// Int32 clamps i to the int32 range and returns it. Negative values map to 0 (counts are
-// non-negative by definition), values larger than math.MaxInt32 are clamped to
-// math.MaxInt32.
+// Int32 clamps i to the int32 range and returns it. Negative values map to 0
+// (counts are non-negative by definition), values larger than math.MaxInt32
+// are clamped to math.MaxInt32.
 func Int32(i int) int32 {
 	if i <= 0 {
 		return 0
@@ -45,28 +45,4 @@ func Int32From64(i int64) int32 {
 		return math.MaxInt32
 	}
 	return int32(i)
-}
-
-// Int32EqualsInt reports whether a and b are equal, performing the comparison
-// in int space so callers do not need to convert b to int32 (which would
-// trigger gosec G115).
-func Int32EqualsInt(a int32, b int) bool {
-	return int(a) == b
-}
-
-// Int32Min returns the smaller of two int32 values. It is a tiny helper to
-// avoid importing math purely for the comparison.
-func Int32Min(a, b int32) int32 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-// Int32Max returns the larger of two int32 values.
-func Int32Max(a, b int32) int32 {
-	if a > b {
-		return a
-	}
-	return b
 }

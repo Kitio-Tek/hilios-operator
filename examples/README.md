@@ -2,13 +2,15 @@
 
 Top-level index of HILIOS manifests grouped by intent.
 
-| Directory | Intent |
+| Path | Intent |
 |---|---|
-| `examples/policy-basic.yaml` etc | Hand-tuned starting points |
-| `examples/catalog/` | Reusable templates per workload kind |
-| `examples/clouds/` | Cloud-flavoured starting points |
-| `examples/integration/` | Per-workload tier and per-app samples |
-| `examples/namespaces/` | Per-namespace bundles |
+| `policy-basic.yaml` | Minimal ResiliencePolicy |
+| `policy-strict.yaml` | Stricter ResiliencePolicy with mitigations |
+| `drill-restore-verification.yaml` | RecoveryDrill that references a Velero backup |
+| `rebalance-check.yaml` | Zone-spread RebalanceCheck |
+| `contention-report.yaml` | Recommend-only ContentionReport |
+| `catalog/` | Reusable templates per workload kind, per topology key, per posture |
+| `integration/` | Minimal StatefulSet shells with the opt-in label |
 
-The `catalog/` directory contains the most widely reusable templates; start
-there if you are unsure which file to copy.
+Start with the curated `catalog/` templates if you are unsure which file to
+copy.

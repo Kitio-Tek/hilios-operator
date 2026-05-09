@@ -75,12 +75,3 @@ func MergeManagedBy(base map[string]string) map[string]string {
 	out[LabelManagedBy] = LabelManagedByValue
 	return out
 }
-
-// Set returns a fresh map with the canonical HILIOS attribution labels for an
-// owner identified by ownerLabel ("policy", "drill", "check", "report") and
-// ownerName.
-func Set(ownerLabel, ownerName string) map[string]string {
-	out := ManagedBy()
-	out[ownerLabel] = ownerName
-	return out
-}

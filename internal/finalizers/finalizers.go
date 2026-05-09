@@ -18,8 +18,6 @@ limitations under the License.
 // finalizer strings used across HILIOS controllers.
 package finalizers
 
-import "k8s.io/apimachinery/pkg/api/meta"
-
 // HiliosFinalizer is the canonical finalizer applied to HILIOS resources that
 // require asynchronous cleanup before deletion completes. Controllers add it
 // on first reconcile and remove it as the last step of their delete handler.
@@ -70,16 +68,4 @@ func Remove(obj metav1Object, name string) bool {
 type metav1Object interface {
 	GetFinalizers() []string
 	SetFinalizers([]string)
-}
-
-// AccessorFor delegates to meta.Accessor and returns just the GetFinalizers /
-// SetFinalizers slice for the supplied object. It is exposed so that callers
-// who hold a runtime.Object (rather than the concrete metav1.Object) can use
-// the same helpers without importing meta directly.
-func AccessorFor(obj interface{}) ([]string, error) {
-	a, err := meta.Accessor(obj)
-	if err != nil {
-		return nil, err
-	}
-	return a.GetFinalizers(), nil
 }
