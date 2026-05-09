@@ -33,7 +33,7 @@ import (
 // not assert anything about the object's status — controllers that need
 // readiness checks should compose this with a Pod or HTTP probe.
 func RunKubernetes(ctx context.Context, c client.Client, hc resiliencev1alpha1.HealthCheck) error {
-	if hc.Type != "Kubernetes" {
+	if hc.Type != resiliencev1alpha1.ProbeTypeKubernetes {
 		return fmt.Errorf("kubernetes probe %q has unexpected type %q", hc.Name, hc.Type)
 	}
 	if hc.Resource == nil {

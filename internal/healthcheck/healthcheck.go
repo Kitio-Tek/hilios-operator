@@ -65,7 +65,7 @@ func Run(ctx context.Context, hc resiliencev1alpha1.HealthCheck) error {
 		timeout = 30 * time.Second
 	}
 	switch hc.Type {
-	case "HTTP":
+	case resiliencev1alpha1.ProbeTypeHTTP:
 		if hc.URL == "" {
 			return fmt.Errorf("http health check %q has empty URL", hc.Name)
 		}
@@ -81,7 +81,7 @@ func Run(ctx context.Context, hc resiliencev1alpha1.HealthCheck) error {
 			return fmt.Errorf("http health check %q: status %d, expected %d", hc.Name, code, expected)
 		}
 		return nil
-	case "Pod":
+	case resiliencev1alpha1.ProbeTypePod:
 		// Pod probes are evaluated by the controller against the API server.
 		// They are short-circuited here so that callers can pre-validate the
 		// spec without performing a live read.

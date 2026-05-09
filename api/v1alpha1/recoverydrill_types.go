@@ -70,6 +70,22 @@ type BackupSource struct {
 	Kind string `json:"kind,omitempty"`
 }
 
+// Probe type identifiers shared between the spec, validation, and the
+// runtime probe runners.
+const (
+	ProbeTypeHTTP       = "HTTP"
+	ProbeTypePod        = "Pod"
+	ProbeTypeCmd        = "Cmd"
+	ProbeTypeKubernetes = "Kubernetes"
+)
+
+// Evidence result identifiers for the EvidenceRecord.Result field.
+const (
+	EvidenceResultPass = "Pass"
+	EvidenceResultFail = "Fail"
+	EvidenceResultSkip = "Skip"
+)
+
 // HealthCheck describes a probe executed against the restored workload.
 // The probe model is inspired by the Litmus Chaos probe schema (httpProbe,
 // k8sProbe, cmdProbe) so users familiar with chaos engineering pipelines can

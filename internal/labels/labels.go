@@ -47,6 +47,11 @@ const (
 	// LabelReport attributes a managed object to its parent ContentionReport.
 	LabelReport = "hilios.io/report"
 
+	// AnnotationTrue is the literal value HILIOS treats as "this annotation is
+	// asserted". Convention here matches Kubernetes' use of "true" as the
+	// canonical truthy annotation value.
+	AnnotationTrue = "true"
+
 	// AnnotationPaused, when set to "true" on a HILIOS resource, suspends
 	// reconciliation without removing the object. The annotation is honoured
 	// by the predicate package so the predicate suppresses reconcile loops

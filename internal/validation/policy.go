@@ -77,19 +77,19 @@ func DrillSpec(d *resiliencev1alpha1.RecoveryDrill) []error {
 	}
 	for i, hc := range d.Spec.HealthChecks {
 		switch hc.Type {
-		case "HTTP":
+		case resiliencev1alpha1.ProbeTypeHTTP:
 			if hc.URL == "" {
 				errs = append(errs, fmt.Errorf("spec.healthChecks[%d].url is required for HTTP probes", i))
 			}
-		case "Kubernetes":
+		case resiliencev1alpha1.ProbeTypeKubernetes:
 			if hc.Resource == nil {
 				errs = append(errs, fmt.Errorf("spec.healthChecks[%d].resource is required for Kubernetes probes", i))
 			}
-		case "Cmd":
+		case resiliencev1alpha1.ProbeTypeCmd:
 			if hc.Command == "" {
 				errs = append(errs, fmt.Errorf("spec.healthChecks[%d].command is required for Cmd probes", i))
 			}
-		case "Pod":
+		case resiliencev1alpha1.ProbeTypePod:
 			if hc.PodSelector == nil {
 				errs = append(errs, fmt.Errorf("spec.healthChecks[%d].podSelector is required for Pod probes", i))
 			}

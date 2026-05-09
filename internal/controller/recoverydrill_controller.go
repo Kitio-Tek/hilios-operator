@@ -87,7 +87,7 @@ func (r *RecoveryDrillReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		for _, e := range errs {
 			if !isAdvisory(e.Error()) {
 				fatal = true
-				events.Warning(r.Recorder, drill, resiliencev1alpha1.ReasonValidationFailed, e.Error())
+				events.Warning(r.Recorder, drill, resiliencev1alpha1.ReasonValidationFailed, "%s", e.Error())
 			}
 		}
 		if fatal {
@@ -167,11 +167,11 @@ func (r *RecoveryDrillReconciler) executeDrill(ctx context.Context, drill *resil
 	for _, hc := range drill.Spec.HealthChecks {
 		var probeErr error
 		switch hc.Type {
-		case "HTTP":
+		case resiliencev1alpha1.ProbeTypeHTTP:
 			probeErr = healthcheck.Run(ctx, hc)
-		case "Kubernetes":
+		case resiliencev1alpha1.ProbeTypeKubernetes:
 			probeErr = healthcheck.RunKubernetes(ctx, r.Client, hc)
-		case "Pod", "Cmd":
+		case resiliencev1alpha1.ProbeTypePod, resiliencev1alpha1.ProbeTypeCmd:
 			drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
 				Step:    "healthcheck:" + hc.Name,
 				Time:    metav1.NewTime(time.Now()),
@@ -245,7 +245,7 @@ func (r *RecoveryDrillReconciler) complete(ctx context.Context, drill *resilienc
 		drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
 			Step: "complete", Time: now, Result: "Pass", Message: msg,
 		})
-		events.Normal(r.Recorder, drill, reason, msg)
+		events.Normal(r.Recorder, drill, reason, "%s", msg)
 	} else {
 		drill.Status.Phase = resiliencev1alpha1.DrillPhaseFailed
 		conditions.False(&drill.Status.Conditions, resiliencev1alpha1.ConditionRunning,
@@ -255,7 +255,7 @@ func (r *RecoveryDrillReconciler) complete(ctx context.Context, drill *resilienc
 		drill.Status.Evidence = append(drill.Status.Evidence, resiliencev1alpha1.EvidenceRecord{
 			Step: "complete", Time: now, Result: "Fail", Message: msg,
 		})
-		events.Warning(r.Recorder, drill, reason, msg)
+		events.Warning(r.Recorder, drill, reason, "%s", msg)
 	}
 
 	if err := r.Status().Update(ctx, drill); err != nil {

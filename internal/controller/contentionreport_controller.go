@@ -120,7 +120,7 @@ func (r *ContentionReportReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		conditions.False(&report.Status.Conditions, resiliencev1alpha1.ConditionMitigated,
 			resiliencev1alpha1.ReasonMitigationDisallowed, mitMsg, report.Generation)
 		report.Status.Message = fmt.Sprintf("contention observed on %d pods", len(report.Status.Findings))
-		events.Warning(r.Recorder, report, resiliencev1alpha1.ReasonContentionDetected, report.Status.Message)
+		events.Warning(r.Recorder, report, resiliencev1alpha1.ReasonContentionDetected, "%s", report.Status.Message)
 	}
 
 	logger.V(1).Info("contention evaluation complete", "matched", report.Status.MatchedTargets,

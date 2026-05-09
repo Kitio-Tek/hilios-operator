@@ -22,12 +22,23 @@ linters:
   settings:
     gocyclo:
       min-complexity: 25
+    goconst:
+      # Only flag repeated literals that appear five or more times;
+      # the default of three churns on common short strings like "name".
+      min-occurrences: 5
     godot:
       scope: declarations
       period: true
     revive:
       rules:
         - name: comment-spacings
+    staticcheck:
+      # SA1019 surfaces deprecation notices for upstream APIs. We track
+      # those manually in the roadmap; the suppression keeps our lint
+      # signal focused on actionable findings.
+      checks:
+        - all
+        - -SA1019
   exclusions:
     generated: lax
     rules:

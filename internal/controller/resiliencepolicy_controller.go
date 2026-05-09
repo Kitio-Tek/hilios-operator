@@ -72,7 +72,7 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		return ctrl.Result{}, fmt.Errorf("get policy: %w", err)
 	}
 
-	if policy.Spec.Suspend || policy.Annotations[labels.AnnotationPaused] == "true" {
+	if policy.Spec.Suspend || policy.Annotations[labels.AnnotationPaused] == labels.AnnotationTrue {
 		conditions.False(&policy.Status.Conditions, resiliencev1alpha1.ConditionReady,
 			resiliencev1alpha1.ReasonSuspended, "policy is suspended", policy.Generation)
 		policy.Status.ObservedGeneration = policy.Generation
@@ -85,7 +85,7 @@ func (r *ResiliencePolicyReconciler) Reconcile(ctx context.Context, req ctrl.Req
 		conditions.False(&policy.Status.Conditions, resiliencev1alpha1.ConditionReady,
 			resiliencev1alpha1.ReasonValidationFailed, err.Error(), policy.Generation)
 		policy.Status.ObservedGeneration = policy.Generation
-		events.Warning(r.Recorder, policy, resiliencev1alpha1.ReasonValidationFailed, err.Error())
+		events.Warning(r.Recorder, policy, resiliencev1alpha1.ReasonValidationFailed, "%s", err.Error())
 		return ctrl.Result{}, r.updateStatus(ctx, policy)
 	}
 	conditions.True(&policy.Status.Conditions, resiliencev1alpha1.ConditionValidated,

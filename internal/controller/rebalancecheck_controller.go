@@ -111,7 +111,7 @@ func (r *RebalanceCheckReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 			resiliencev1alpha1.ReasonReplicaSkew,
 			"apply topology spread or move replicas", check.Generation)
 		check.Status.Message = fmt.Sprintf("replica skew detected: %d (max %d)", skew, check.Spec.MaxSkew)
-		events.Warning(r.Recorder, check, resiliencev1alpha1.ReasonReplicaSkew, check.Status.Message)
+		events.Warning(r.Recorder, check, resiliencev1alpha1.ReasonReplicaSkew, "%s", check.Status.Message)
 	} else {
 		conditions.True(&check.Status.Conditions, resiliencev1alpha1.ConditionBalanced,
 			resiliencev1alpha1.ReasonReplicaBalanced,

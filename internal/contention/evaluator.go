@@ -29,6 +29,15 @@ import (
 	resiliencev1alpha1 "github.com/Kitio-Tek/hilios-operator/api/v1alpha1"
 )
 
+// Contention reasons surfaced on ContentionFinding.Reason. They mirror the
+// PodCondition reasons that container runtimes commonly set when a workload
+// is throttled, under memory pressure, or hosted on a noisy node.
+const (
+	ReasonThrottled      = "Throttled"
+	ReasonMemoryPressure = "MemoryPressure"
+	ReasonCPUSteal       = "CPUSteal"
+)
+
 // Evaluator returns a finding when the pod is experiencing contention or nil
 // otherwise. now is supplied so callers can record deterministic timestamps.
 type Evaluator interface {
@@ -57,7 +66,7 @@ func (PodConditionEvaluator) Evaluate(pod *corev1.Pod, now time.Time) *resilienc
 			continue
 		}
 		switch c.Reason {
-		case "Throttled", "MemoryPressure", "CPUSteal":
+		case ReasonThrottled, ReasonMemoryPressure, ReasonCPUSteal:
 			return &resiliencev1alpha1.ContentionFinding{
 				Pod:            pod.Name,
 				Node:           pod.Spec.NodeName,
@@ -74,11 +83,11 @@ func (PodConditionEvaluator) Evaluate(pod *corev1.Pod, now time.Time) *resilienc
 // Recommendation returns the canonical operator hint for a given contention reason.
 func Recommendation(reason string) string {
 	switch reason {
-	case "Throttled":
+	case ReasonThrottled:
 		return "increase CPU limits or relax CPU manager static pinning"
-	case "MemoryPressure":
+	case ReasonMemoryPressure:
 		return "raise memory requests or move pod to a less crowded node"
-	case "CPUSteal":
+	case ReasonCPUSteal:
 		return "isolate to a node with stable steal time or apply pod priority"
 	}
 	return ""
