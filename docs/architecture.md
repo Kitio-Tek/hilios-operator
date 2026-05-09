@@ -36,8 +36,11 @@ Every reconciler follows the same shape:
 4. Validate the spec. Update `Validated` and `Ready` conditions on failure.
 5. Compute the observed state from the cluster (matched workloads, distribution,
    findings).
-6. Update the status subresource via `internal/statuswriter` so conflicts retry
-   automatically.
+6. Update the status subresource through the controller-runtime client. On
+   `Conflict` the reconcile returns an error and the manager requeues with
+   exponential backoff. The `internal/statuswriter` helper is available for
+   reconcilers that need an in-call retry loop; it is not yet wired into the
+   built-in controllers.
 7. Emit Kubernetes Events through `internal/events` for transitions a human
    operator should see.
 8. Increment metrics in `internal/metrics`.
@@ -56,7 +59,7 @@ Every reconciler follows the same shape:
 | `internal/metrics` | Prometheus collectors registered with the manager |
 | `internal/predicates` | Filter reconcile events to generation/pause changes |
 | `internal/scheduling` | Compute next requeue duration |
-| `internal/statuswriter` | Retry-on-conflict status update helper |
+| `internal/statuswriter` | Retry-on-conflict status update helper (opt-in) |
 | `internal/topology` | Compute replica distribution and skew |
 
 Each package is small (typically under 100 lines) and ships with a focused unit
@@ -67,9 +70,9 @@ controller-runtime types except where explicitly required.
 
 - **Validation failure**: `Validated` condition becomes False with reason
   `ValidationFailed`. `Ready` becomes False. No mitigations are applied.
-- **API server conflict**: `statuswriter.UpdateStatus` retries with
-  `retry.DefaultRetry`. Persistent conflicts surface as reconcile errors and
-  trigger controller-runtime exponential backoff.
+- **API server conflict**: a status update conflict surfaces as a reconcile
+  error and triggers controller-runtime exponential backoff. Reconcilers that
+  opt into the `internal/statuswriter` helper retry in-call before backing off.
 - **Selector matched no workloads**: `Degraded` condition becomes True with
   reason `SelectorEmpty`. The policy is still considered Ready so that other
   controllers depending on the policy can proceed.

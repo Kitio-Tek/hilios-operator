@@ -6,6 +6,11 @@ inspired by the Litmus Chaos probe model so platform engineers familiar with
 chaos pipelines can reuse mental models. Unlike Litmus, HILIOS probes are
 read-only by design: they verify state but never inject failures.
 
+The controller currently executes `HTTP` and `Kubernetes` probes inline.
+`Pod` and `Cmd` probes are recorded as `Skip` evidence; an external runner is
+expected to perform them and update status. The probe schema is shared so the
+spec is authored once and consumed by either path.
+
 ## Probe Types
 
 ### `HTTP`

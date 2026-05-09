@@ -9,16 +9,16 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-Hilios Operator is a Kubernetes operator for resilience enforcement and corrective
+HILIOS Operator is a Kubernetes operator for resilience enforcement and corrective
 orchestration of distributed workloads. It continuously evaluates declarative
 resilience policies and executes guarded corrective workflows such as restore
 verification, topology rebalancing checks, and noisy-neighbor mitigation while
 recording audit-friendly evidence as Kubernetes-native status conditions.
 
-## Why Hilios
+## Why HILIOS
 
 Backups, failover plans, and workload fairness controls often exist only on paper.
-Hilios treats resilience as a control loop: a `ResiliencePolicy` declares what
+HILIOS treats resilience as a control loop: a `ResiliencePolicy` declares what
 should be true about a workload, the controller continuously evaluates the
 declaration, and `RecoveryDrill`, `RebalanceCheck`, and `ContentionReport`
 resources record what was tested and what was found. Operators do not deploy a
@@ -95,9 +95,16 @@ kubectl describe rpol payments
 ### Running a RecoveryDrill
 
 A `RecoveryDrill` is a one-shot or scheduled verification. The current build
-covers two drill types: `RestoreVerification` (used to validate that a backup
-can be restored into a temporary namespace) and `FailoverDrill` (used to
-exercise the failover path of a stateful workload).
+covers two drill types:
+
+- **`RestoreVerification`** creates a verification namespace and runs the
+  configured probes against it. The actual restore must be triggered
+  externally - for example by a Velero scheduled restore that targets the
+  verification namespace. Native Velero invocation is on the v0.6 roadmap.
+- **`FailoverDrill`** is a placeholder type that runs the configured probes
+  but does not yet drive the failover sequence itself. It is intended for
+  external runners (Argo Workflows, CronJobs) that orchestrate the failover
+  and rely on HILIOS for evidence collection.
 
 ```yaml
 apiVersion: resilience.hilios.io/v1alpha1

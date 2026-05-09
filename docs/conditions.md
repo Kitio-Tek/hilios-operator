@@ -34,8 +34,8 @@ reasons that may accompany them.
 | Type | Reasons | Description |
 |---|---|---|
 | `Observed` | `ContentionDetected`, `Ready` | Contention signals were observed in the look-back window |
-| `Mitigated` | `MitigationApplied`, `MitigationDisallowed` | Mitigation was applied or skipped |
-| `Escalated` | `Escalated` | Contention persisted past the policy threshold |
+| `Mitigated` | `MitigationDisallowed`, `Ready` | Always False today: HILIOS records recommendations on findings; active mitigation is on the roadmap |
+| `Escalated` | `Escalated` | Reserved for future use: contention persisted past the policy threshold |
 
 ## Generic Reasons
 
