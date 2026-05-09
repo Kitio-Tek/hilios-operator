@@ -11,8 +11,9 @@ HILIOS uses several scanners and linters to keep the code clean and safe.
 | govulncheck | Stdlib + module CVE scan | `.github/workflows/security.yml` |
 | Trivy | Filesystem and image scan | `.github/workflows/trivy.yml` |
 | CodeQL | Semantic vulnerability scan | `.github/workflows/codeql.yml` |
+| Gitleaks | Secret and credential leak detection | `.github/workflows/gitleaks.yml` |
 | Helm lint | Chart linting | `.github/workflows/helm.yml` |
-| KUTTL | End-to-end tests | local + manual workflow |
+| KUTTL | End-to-end tests | `.github/workflows/e2e.yml` |
 
 The lint, security, and helm jobs are required for `main`.
 
