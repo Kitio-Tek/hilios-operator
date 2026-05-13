@@ -1,3 +1,4 @@
 index-path: ./
 pages-branch: gh-pages
 skip-existing: true
+release-name-template: "helm-v{{ .Version }}"

@@ -1,37 +1,76 @@
 name: Publish Charts
 
+# Publishes the Helm chart in charts/hilios-operator to a chart museum hosted
+# on the gh-pages branch of this repository. Consumers add the repo with:
+#
+#   helm repo add hilios https://kitio-tek.github.io/hilios-operator
+#
+# The workflow runs on every push to main that touches charts/** so that the
+# rolling chart on main is always installable from the GitHub Pages index.
+# Chart releases are tagged "helm-v<chart-version>" and marked as pre-release
+# so they do not displace the operator's user-facing Latest pointer.
+
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
     paths:
       - "charts/**"
       - ".github/workflows/charts.yml"
+      - "cr.yaml"
   workflow_dispatch:
 
 permissions:
   contents: write
   pages: write
-  id-token: write
 
 concurrency:
   group: charts-release
   cancel-in-progress: false
 
 jobs:
-  release:
+  publish:
     name: Release Helm chart to GitHub Pages
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Configure Git
+      - name: Configure git identity
         run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config user.name  "Kitio-Tek"
+          git config user.email "kmyriantek@gmail.com"
+
+      - name: Ensure gh-pages branch exists
+        run: |
+          if ! git ls-remote --exit-code --heads origin gh-pages; then
+            echo "Bootstrapping gh-pages from an empty tree."
+            current_ref=$(git rev-parse --abbrev-ref HEAD)
+            git switch --orphan gh-pages
+            cat > index.yaml <<'YAML'
+          apiVersion: v1
+          entries: {}
+          YAML
+            cat > index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head><meta charset="utf-8"><title>Hilios Operator Helm Charts</title></head>
+          <body>
+          <h1>Hilios Operator Helm Charts</h1>
+          <p>Helm chart repository for the Hilios Operator.</p>
+          <pre>helm repo add hilios https://kitio-tek.github.io/hilios-operator
+          helm repo update
+          helm install hilios hilios/hilios-operator -n hilios-system --create-namespace</pre>
+          <p><a href="https://github.com/Kitio-Tek/hilios-operator">Source on GitHub</a></p>
+          </body>
+          </html>
+          HTML
+            git add index.yaml index.html
+            git commit -m "Bootstrap empty chart museum"
+            git push origin gh-pages
+            git switch "$current_ref"
+          fi
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
@@ -40,8 +79,24 @@ jobs:
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.6.0
-        env:
-          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           charts_dir: charts
-          config: .github/cr-config.yaml
+          mark_as_latest: false
+          config: cr.yaml
+        env:
+          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CR_SKIP_EXISTING: "true"
+          CR_MAKE_RELEASE_LATEST: "false"
+
+      - name: Demote chart release out of Latest
+        # chart-releaser cannot tag the release as a pre-release directly, so
+        # flip the flag via the GitHub API after the fact. Operator releases
+        # (v0.x.y) remain the user-facing Latest entry.
+        run: |
+          chart_version=$(awk '/^version:/ {print $2; exit}' charts/hilios-operator/Chart.yaml)
+          release="helm-v${chart_version}"
+          if gh release view "$release" >/dev/null 2>&1; then
+            gh release edit "$release" --prerelease
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
