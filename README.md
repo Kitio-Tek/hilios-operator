@@ -36,7 +36,18 @@ that protect the workloads already running in the cluster.
 
 ### Installing with Helm
 
-Install the operator into a dedicated namespace:
+The Helm chart is published to a GitHub Pages chart repository on every
+push to `main` that touches `charts/`. Install the latest release with:
+
+```bash
+helm repo add hilios https://kitio-tek.github.io/hilios-operator
+helm repo update
+helm install hilios hilios/hilios-operator \
+  --namespace hilios-system \
+  --create-namespace
+```
+
+To install directly from a working tree (development mode):
 
 ```bash
 helm install hilios charts/hilios-operator/ \

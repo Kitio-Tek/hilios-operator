@@ -1,0 +1,3 @@
+index-path: ./
+pages-branch: gh-pages
+skip-existing: true
