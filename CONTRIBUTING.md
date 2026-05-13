@@ -26,8 +26,8 @@ local development workflow.
 - Generated files (`config/crd/bases`, `api/.../zz_generated.deepcopy.go`) must
   be committed alongside the source changes that produced them. The CI
   pipeline fails the build if generated artefacts are out of date.
-- Add or update KUTTL tests for behaviours that affect the controller's steady
-  state.
+- Add or update [KUTTL](https://github.com/kudobuilder/kuttl) tests for
+  behaviours that affect the controller's steady state.
 
 ## Code Style
 

@@ -260,7 +260,7 @@ Each reconciler:
 - ContentionReport with pluggable signal evaluator (default: PodConditions)
 - Standard Kubernetes API: conditions, events, finalizers, generation tracking
 - Helm chart with RBAC, leader election, ServiceMonitor
-- KUTTL end-to-end tests
+- [KUTTL](https://github.com/kudobuilder/kuttl) end-to-end tests
 - Dependabot with auto-merge for minor/patch updates
 - govulncheck, gosec, and Trivy filesystem scans on every PR
 - CodeQL weekly Go static analysis
