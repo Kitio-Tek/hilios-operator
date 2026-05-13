@@ -19,4 +19,3 @@ tests/
 *.tgz
 *.test
 coverage*.out
-.claude/

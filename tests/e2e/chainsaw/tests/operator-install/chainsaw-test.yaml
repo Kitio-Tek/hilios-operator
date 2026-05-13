@@ -1,0 +1,58 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: operator-install
+spec:
+  description: |
+    Verifies that the operator deployment installed by the Helm chart reaches
+    the Available condition with the expected ready replica count, and that
+    all four resilience CRDs are Established. Demonstrates JMESPath-based
+    partial array assertions which KUTTL cannot express directly.
+  steps:
+    - name: deployment-available
+      try:
+        - assert:
+            resource:
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: hilios-hilios-operator
+                namespace: hilios-system
+              status:
+                (readyReplicas >= `1`): true
+                (availableReplicas >= `1`): true
+                (conditions[?type == 'Available'] | [0].status): "True"
+    - name: crds-established
+      try:
+        - assert:
+            resource:
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: resiliencepolicies.resilience.hilios.io
+              status:
+                (conditions[?type == 'Established'] | [0].status): "True"
+        - assert:
+            resource:
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: recoverydrills.resilience.hilios.io
+              status:
+                (conditions[?type == 'Established'] | [0].status): "True"
+        - assert:
+            resource:
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: rebalancechecks.resilience.hilios.io
+              status:
+                (conditions[?type == 'Established'] | [0].status): "True"
+        - assert:
+            resource:
+              apiVersion: apiextensions.k8s.io/v1
+              kind: CustomResourceDefinition
+              metadata:
+                name: contentionreports.resilience.hilios.io
+              status:
+                (conditions[?type == 'Established'] | [0].status): "True"

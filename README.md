@@ -6,6 +6,7 @@
 [![CodeQL](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/codeql.yml)
 [![Trivy](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/trivy.yml/badge.svg?branch=main)](https://github.com/Kitio-Tek/hilios-operator/actions/workflows/trivy.yml)
 [![Latest release](https://img.shields.io/github/v/release/Kitio-Tek/hilios-operator?sort=semver)](https://github.com/Kitio-Tek/hilios-operator/releases)
+[![Go Reference](https://pkg.go.dev/badge/github.com/Kitio-Tek/hilios-operator.svg)](https://pkg.go.dev/github.com/Kitio-Tek/hilios-operator)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Kitio-Tek/hilios-operator)](https://goreportcard.com/report/github.com/Kitio-Tek/hilios-operator)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
@@ -260,7 +261,7 @@ Each reconciler:
 - ContentionReport with pluggable signal evaluator (default: PodConditions)
 - Standard Kubernetes API: conditions, events, finalizers, generation tracking
 - Helm chart with RBAC, leader election, ServiceMonitor
-- [KUTTL](https://github.com/kudobuilder/kuttl) end-to-end tests
+- [KUTTL](https://github.com/kudobuilder/kuttl) and [Chainsaw](https://github.com/kyverno/chainsaw) end-to-end tests
 - Dependabot with auto-merge for minor/patch updates
 - govulncheck, gosec, and Trivy filesystem scans on every PR
 - CodeQL weekly Go static analysis
@@ -280,7 +281,10 @@ Container image is published to ghcr.io/kitio-tek/hilios-operator. Multi-arch (a
 
 ### Ports
 
-The manager binds 8443 for metrics (HTTPS by default) and 8081 for health probes.
+The manager binds 8443 for metrics and 8081 for health probes. The
+`--metrics-secure` flag defaults to true in the binary; the bundled Helm
+chart passes `--metrics-secure=false` so the metrics endpoint is plain HTTP
+unless the deployment template is overridden.
 
 ### RBAC
 
@@ -310,8 +314,8 @@ Tested on Kubernetes 1.28-1.30. Newer versions may work but are not part of CI.
 ## Development
 
 See [DEVELOPER.md](DEVELOPER.md) for local development setup, including how to
-run the operator against a kind cluster and how to run unit, integration, and
-KUTTL tests.
+run the operator against a kind cluster and how to run unit, integration,
+KUTTL, and Chainsaw tests.
 
 ## Contributing
 

@@ -1,0 +1,14 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Configuration
+metadata:
+  name: hilios-chainsaw
+spec:
+  timeouts:
+    apply: 30s
+    assert: 180s
+    cleanup: 60s
+    delete: 30s
+    error: 30s
+    exec: 60s
+  parallel: 1
+  failFast: false

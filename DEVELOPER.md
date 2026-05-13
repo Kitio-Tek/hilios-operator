@@ -4,13 +4,14 @@ This document describes how to build, run, and test HILIOS Operator locally.
 
 ## Prerequisites
 
-- Go 1.24 or later
+- Go 1.26 or later (matches the toolchain pinned in `go.mod` and CI)
 - Docker
 - kind 0.20 or later
 - kubectl 1.27 or later
 - Helm 3.x
 - operator-sdk 1.38 or later
 - KUTTL 0.15 or later (for end-to-end tests)
+- Chainsaw 0.2.15 or later (for end-to-end tests)
 
 ## Repository Layout
 
@@ -28,6 +29,7 @@ internal/labels/      Well-known label constants
 internal/predicates/  controller-runtime predicates
 internal/topology/    Topology distribution and skew computation
 tests/e2e/kuttl/      KUTTL test cases
+tests/e2e/chainsaw/   Chainsaw test cases
 test/e2e/             operator-sdk e2e scaffold
 hack/                 Code generation boilerplate
 ```
@@ -107,7 +109,14 @@ Tear down:
 kind delete cluster --name hilios
 ```
 
-## End-to-End Tests with KUTTL
+## End-to-End Tests
+
+The repository ships two end-to-end suites that both run against a real
+Kubernetes API. KUTTL is retained for the install path and the most basic
+steady-state assertions; Chainsaw owns the new behavioural coverage where its
+richer assertion language pays off.
+
+### KUTTL
 
 The KUTTL suite lives in `tests/e2e/kuttl`. Each numbered directory is a test
 case; KUTTL applies the manifests in lexicographic order and verifies the
@@ -116,12 +125,35 @@ assertions.
 ```bash
 helm install hilios charts/hilios-operator/ \
   --namespace hilios-system --create-namespace
+make test-e2e-kuttl
+# or directly
 kubectl kuttl test tests/e2e/kuttl/ --config tests/e2e/kuttl/kuttl-test.yaml
 ```
 
-KUTTL is the same harness used by the operator-sdk and several mature
-operators. It verifies that the operator reaches the expected steady state for
-each scenario without depending on Go test infrastructure.
+### Chainsaw
+
+The Chainsaw suite lives in `tests/e2e/chainsaw`. Each subdirectory contains a
+`chainsaw-test.yaml` with `try`, `assert`, and `cleanup` blocks. Chainsaw is
+preferred for tests that need:
+
+- ordered or unordered list matching (`matchLabels` versus `initContainers`),
+- comparative assertions (`length`, `>`, `<`, JMESPath),
+- CLI or script verification alongside object assertions,
+- per-step cleanup so the suite is hermetic when re-run against the same
+  cluster.
+
+```bash
+helm install hilios charts/hilios-operator/ \
+  --namespace hilios-system --create-namespace
+make test-e2e-chainsaw
+# or directly
+chainsaw test tests/e2e/chainsaw/tests/ --config tests/e2e/chainsaw/.chainsaw.yaml
+```
+
+Install the Chainsaw CLI with `go install github.com/kyverno/chainsaw@latest`
+or download the version pinned in `.github/workflows/e2e.yml`.
+
+`make test-e2e` runs both suites sequentially.
 
 ## Linting
 

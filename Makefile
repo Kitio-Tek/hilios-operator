@@ -97,9 +97,14 @@ test-envtest: envtest manifests generate ## Run controller integration tests aga
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" \
 		go test ./internal/controller/... -coverprofile=cover-envtest.out
 
-.PHONY: test-e2e
-test-e2e: ## Run KUTTL end-to-end tests against the cluster pointed at by KUBECONFIG.
+.PHONY: test-e2e test-e2e-kuttl test-e2e-chainsaw
+test-e2e: test-e2e-kuttl test-e2e-chainsaw ## Run KUTTL and Chainsaw end-to-end tests against the cluster pointed at by KUBECONFIG.
+
+test-e2e-kuttl: ## Run KUTTL end-to-end tests against the cluster pointed at by KUBECONFIG.
 	$(KUBECTL) kuttl test tests/e2e/kuttl/ --config tests/e2e/kuttl/kuttl-test.yaml
+
+test-e2e-chainsaw: ## Run Chainsaw end-to-end tests against the cluster pointed at by KUBECONFIG.
+	chainsaw test tests/e2e/chainsaw/tests/ --config tests/e2e/chainsaw/.chainsaw.yaml
 
 ##@ Build
 

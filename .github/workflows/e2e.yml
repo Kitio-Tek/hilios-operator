@@ -15,6 +15,7 @@ env:
   KIND_VERSION: "v0.31.0"
   KIND_NODE_IMAGE: "kindest/node:v1.30.0"
   KUTTL_VERSION: "v0.15.0"
+  CHAINSAW_VERSION: "v0.2.15"
   CONTROLLER_GEN_VERSION: "v0.18.0"
 
 jobs:
@@ -72,6 +73,69 @@ jobs:
       - name: Run KUTTL tests
         run: |
           kubectl-kuttl test tests/e2e/kuttl/tests/ --config tests/e2e/kuttl/kuttl-test.yaml
+
+      - name: Operator logs on failure
+        if: failure()
+        run: |
+          kubectl logs -n hilios-system -l app.kubernetes.io/name=hilios-operator --tail=200
+          kubectl get rpol,rdrill,rcheck,creport -A -o yaml
+
+  chainsaw:
+    name: Chainsaw
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.14.4
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1
+        with:
+          version: ${{ env.KIND_VERSION }}
+          node_image: ${{ env.KIND_NODE_IMAGE }}
+          cluster_name: hilios-chainsaw
+
+      - name: Install Chainsaw
+        run: |
+          curl -Lo chainsaw.tar.gz "https://github.com/kyverno/chainsaw/releases/download/${CHAINSAW_VERSION}/chainsaw_linux_amd64.tar.gz"
+          tar -xzf chainsaw.tar.gz chainsaw
+          chmod +x chainsaw
+          sudo mv chainsaw /usr/local/bin/
+          chainsaw version
+
+      - name: Build and load image
+        run: |
+          docker build -t hilios-operator:e2e .
+          kind load docker-image hilios-operator:e2e --name hilios-chainsaw
+
+      - name: Generate manifests and sync chart
+        run: |
+          GOBIN=$(pwd)/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@${{ env.CONTROLLER_GEN_VERSION }}
+          export PATH=$(pwd)/bin:$PATH
+          make manifests generate chart-sync
+
+      - name: Install operator
+        run: |
+          helm install hilios charts/hilios-operator/ \
+            --namespace hilios-system --create-namespace \
+            --set image.repository=hilios-operator \
+            --set image.tag=e2e \
+            --set image.pullPolicy=IfNotPresent
+          kubectl wait --for=condition=Available --timeout=120s \
+            deployment/hilios-hilios-operator -n hilios-system
+
+      - name: Run Chainsaw tests
+        run: |
+          chainsaw test tests/e2e/chainsaw/tests/ --config tests/e2e/chainsaw/.chainsaw.yaml
 
       - name: Operator logs on failure
         if: failure()

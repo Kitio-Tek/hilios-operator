@@ -26,8 +26,16 @@ local development workflow.
 - Generated files (`config/crd/bases`, `api/.../zz_generated.deepcopy.go`) must
   be committed alongside the source changes that produced them. The CI
   pipeline fails the build if generated artefacts are out of date.
-- Add or update [KUTTL](https://github.com/kudobuilder/kuttl) tests for
-  behaviours that affect the controller's steady state.
+- Add or update end-to-end tests for behaviours that affect the controller's
+  steady state. The repository ships two complementary suites:
+  - [KUTTL](https://github.com/kudobuilder/kuttl) under `tests/e2e/kuttl`
+    guards the install path and basic steady-state assertions.
+  - [Chainsaw](https://github.com/kyverno/chainsaw) under `tests/e2e/chainsaw`
+    covers behaviours where KUTTL is too limited, in particular ordered
+    versus unordered list assertions, comparative operators (`>`, `<`,
+    `length`), JMESPath status queries, CLI / script verification, and
+    per-step cleanup. New behavioural coverage should generally be added to
+    the Chainsaw suite.
 
 ## Code Style
 
@@ -45,8 +53,9 @@ local development workflow.
   at least one validation or transition failure mode.
 - Pure helpers (cron parsing, topology skew, finalizer manipulation) ship with
   table tests.
-- KUTTL tests cover end-to-end scenarios that exercise the CRD lifecycle on a
-  real Kubernetes API.
+- KUTTL and Chainsaw tests cover end-to-end scenarios that exercise the CRD
+  lifecycle on a real Kubernetes API. Both suites run on every PR via the
+  `E2E` workflow.
 
 ## Releasing
 

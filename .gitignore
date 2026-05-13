@@ -35,11 +35,6 @@ go.work.sum
 # build artifacts
 dist/
 bin/k8s/
-
-# AI assistant scratch — never committed.
-.claude/
-.aider*
-
 # Kubeconfig files - never commit cluster credentials.
 kubeconfig
 *.kubeconfig

@@ -1,0 +1,62 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: resilience-policy
+spec:
+  description: |
+    Creates a ResiliencePolicy and asserts that the controller marks it
+    Validated and Ready. Exercises both ordered-list semantics (verifications)
+    and comparative assertions on the SLO fields.
+  steps:
+    - name: create-policy
+      try:
+        - apply:
+            resource:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: ResiliencePolicy
+              metadata:
+                name: example-policy
+              spec:
+                targetSelector:
+                  matchLabels:
+                    hilios.io/enabled: "true"
+                verifications:
+                  - kind: RestoreVerification
+                    intervalSeconds: 600
+                    freshnessSeconds: 86400
+                slo:
+                  recoveryTimeSeconds: 600
+                  maxReplicaSkew: 1
+        - assert:
+            resource:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: ResiliencePolicy
+              metadata:
+                name: example-policy
+              spec:
+                (length(verifications)): 1
+                (slo.recoveryTimeSeconds <= `600`): true
+              status:
+                (conditions[?type == 'Validated'] | [0].status): "True"
+                (conditions[?type == 'Ready'] | [0].status): "True"
+      cleanup:
+        - delete:
+            ref:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: ResiliencePolicy
+              name: example-policy
+    - name: reject-empty-selector
+      try:
+        - script:
+            content: |
+              set -e
+              cat <<'EOF' | kubectl apply -f - && exit 1 || true
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: ResiliencePolicy
+              metadata:
+                name: invalid-policy
+              spec: {}
+              EOF
+              echo "rejected as expected"
+            check:
+              ($error == null): true

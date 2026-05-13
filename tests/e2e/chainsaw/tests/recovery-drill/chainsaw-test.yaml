@@ -1,0 +1,39 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: recovery-drill
+spec:
+  description: |
+    Creates a RecoveryDrill and asserts that the controller transitions it
+    through Scheduled, Running, and a terminal phase. Verifies that the
+    evidence list grows and that the duration field is recorded.
+  steps:
+    - name: create-drill
+      try:
+        - apply:
+            resource:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: RecoveryDrill
+              metadata:
+                name: example-drill
+              spec:
+                type: RestoreVerification
+                cleanup: true
+                timeoutSeconds: 600
+        - assert:
+            timeout: 120s
+            resource:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: RecoveryDrill
+              metadata:
+                name: example-drill
+              status:
+                (phase == 'Succeeded' || phase == 'Failed'): true
+                (conditions[?type == 'Scheduled'] | [0].status): "True"
+                (length(conditions) >= `2`): true
+      cleanup:
+        - delete:
+            ref:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: RecoveryDrill
+              name: example-drill

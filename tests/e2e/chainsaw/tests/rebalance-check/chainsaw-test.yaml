@@ -1,0 +1,40 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: rebalance-check
+spec:
+  description: |
+    Creates a RebalanceCheck against a selector that matches no pods. The
+    controller should mark the resource Balanced without raising
+    ActionRequired or Drifted, exercising the empty-population branch.
+  steps:
+    - name: create-rebalance-check
+      try:
+        - apply:
+            resource:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: RebalanceCheck
+              metadata:
+                name: example-rebalance
+              spec:
+                targetSelector:
+                  matchLabels:
+                    app: nonexistent
+                topologyKey: topology.kubernetes.io/zone
+                maxSkew: 1
+        - assert:
+            resource:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: RebalanceCheck
+              metadata:
+                name: example-rebalance
+              status:
+                (conditions[?type == 'Balanced'] | [0].status): "True"
+                (conditions[?type == 'Drifted'] | [0].status): "False"
+                (conditions[?type == 'ActionRequired'] | [0].status): "False"
+      cleanup:
+        - delete:
+            ref:
+              apiVersion: resilience.hilios.io/v1alpha1
+              kind: RebalanceCheck
+              name: example-rebalance
