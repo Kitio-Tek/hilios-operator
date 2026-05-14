@@ -4,7 +4,10 @@
 
 | Page | Topic |
 |---|---|
+| [usage.md](usage.md) | Declaring policies and running drills, checks, and reports |
+| [api-reference.md](api-reference.md) | Field tables for the four CRDs |
 | [architecture.md](architecture.md) | Reconciler topology and internal package map |
+| [operations.md](operations.md) | Logging, ports, RBAC, leader election, telemetry, kubectl helper |
 | [conditions.md](conditions.md) | Every condition the operator emits |
 | [metrics.md](metrics.md) | Prometheus collectors |
 | [probes.md](probes.md) | HTTP, Pod, Cmd, Kubernetes probe semantics |
