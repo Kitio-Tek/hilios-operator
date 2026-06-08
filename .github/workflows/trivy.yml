@@ -17,7 +17,7 @@ jobs:
     name: Trivy filesystem scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       # Two-pass scan: first emit SARIF without failing so the upload step
       # always runs; second pass fails the build if any CRITICAL/HIGH finding
       # is present so accidentally-bumped vulnerable deps cannot land.
