@@ -1,0 +1,34 @@
+name: Dependabot auto-merge
+
+# Hands-off CVE / dependency patching: once CI passes, Dependabot PRs for
+# patch and minor updates (which includes security fixes) merge themselves.
+# Major bumps are left for manual review.
+#
+# Requires (one-time, in repo Settings):
+#   - Settings > General > "Allow auto-merge" enabled
+#   - A branch protection rule on main requiring the CI status checks,
+#     so auto-merge waits for green instead of merging immediately.
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v2
+
+      - name: Enable auto-merge (patch/minor + security)
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
